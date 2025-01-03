@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(port, '0.0.0.0');
-  logger.log('App is listening...');
+  logger.log(`App is listening on http://localhost:${port}...`);
 }
 
 bootstrap();
