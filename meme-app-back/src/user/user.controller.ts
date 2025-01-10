@@ -1,4 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
 
@@ -14,7 +21,13 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  getByEmail(@Param() id: string): Promise<UserEntity> {
+  getById(@Param() id: string): Promise<UserEntity> {
     return this.userService.getOneById(id);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':id')
+  deleteOne(@Param() id: string): Promise<void> {
+    return this.userService.deleteOne(id);
   }
 }
