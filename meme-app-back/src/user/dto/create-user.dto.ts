@@ -14,9 +14,9 @@ export class CreateUserDto {
   @IsOptional()
   fullName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate()
-  birthday: Date;
+  birthday?: Date;
 
   @IsNotEmpty()
   @IsIn(['user', 'moderator'])

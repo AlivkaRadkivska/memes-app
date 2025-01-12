@@ -11,8 +11,8 @@ export class UserEntity {
   @Column()
   username: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @Column({ name: 'full_name', nullable: true })
   fullName?: string;
@@ -20,8 +20,8 @@ export class UserEntity {
   @Column()
   role: string;
 
-  @Column()
-  birthday: Date;
+  @Column({ nullable: true })
+  birthday?: Date;
 
   @Column({ nullable: true })
   signature?: string;
