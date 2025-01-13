@@ -1,5 +1,6 @@
 import { IsIn } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from 'src/user/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'publication' })
 export class PublicationEntity {
@@ -12,8 +13,10 @@ export class PublicationEntity {
   @Column()
   description: string;
 
-  @Column()
-  author: string;
+  @ManyToOne(() => UserEntity, (user) => user.publications, {
+    eager: true,
+  })
+  author: UserEntity;
 
   @Column({ name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
