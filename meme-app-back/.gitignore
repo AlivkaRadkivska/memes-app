@@ -58,3 +58,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Docker composer
 compose.y?ml
 docker-compose.y?ml
+
+notes.txt

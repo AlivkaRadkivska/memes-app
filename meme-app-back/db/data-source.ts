@@ -1,19 +1,23 @@
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { DataSource } from 'typeorm';
+import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
+import { DataSource } from 'typeorm';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+config();
 
 export function getDataSourceOptions(
   configService: ConfigService,
 ): PostgresConnectionOptions {
   return {
     type: 'postgres',
-    host: configService.get('PGHOST'),
-    port: configService.get('PGPORT'),
-    username: configService.get('PGUSER'),
-    password: configService.get('PGPASSWORD'),
-    database: configService.get('PGDATABASE'),
-    entities: [__dirname + '/../**/*.entity.{js,ts}'],
-    synchronize: true,
+    host: configService.getOrThrow<string>('PGHOST'),
+    port: configService.getOrThrow<number>('PGPORT'),
+    username: configService.getOrThrow<string>('PGUSER'),
+    password: configService.getOrThrow<string>('PGPASSWORD'),
+    database: configService.getOrThrow<string>('PGDATABASE'),
+    entities: [__dirname + './../src/**/*.entity.{js,ts}'],
+    migrations: [__dirname + '/migrations/*-migration.ts'],
+    migrationsRun: true,
+    synchronize: false,
   };
 }
 
