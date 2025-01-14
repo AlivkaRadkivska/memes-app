@@ -22,7 +22,19 @@ export class ShowPublicationDto {
   description: string;
 
   @Expose()
+  createdAt: Date;
+
+  @Expose()
   status: string;
+
+  @Expose()
+  isBanned: boolean;
+
+  @Expose()
+  banReason: string;
+
+  @Expose()
+  banExpiresAt: Date;
 
   @Expose()
   @Type(() => User)

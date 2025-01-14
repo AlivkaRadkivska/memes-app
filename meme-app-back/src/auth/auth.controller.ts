@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -43,7 +44,9 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
-  getGoogleRedirect() {}
+  getGoogleRedirect(@Req() req): AuthResultDto {
+    return req.user;
+  }
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)

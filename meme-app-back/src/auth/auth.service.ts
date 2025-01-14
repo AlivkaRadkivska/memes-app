@@ -11,6 +11,7 @@ import { SignInCredentialsDto } from './dto/sign-in-credentials.dto';
 import { SignUpCredentialsDto } from './dto/sign-up-credentials.dto';
 import { Profile } from 'passport';
 import { UserEntity } from 'src/user/user.entity';
+import { ShowUserDto } from 'src/user/dto/show-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -64,7 +65,7 @@ export class AuthService {
 
   async loginWithGoogle(profile: Profile): Promise<AuthResultDto> {
     const email = profile.emails[0]?.value;
-    let user: UserEntity;
+    let user: ShowUserDto | UserEntity;
 
     try {
       user = await this.userService.getOneByEmail(email);
