@@ -4,9 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { jwtOptions } from '../constants/jwt-options.constant';
 import { Request } from 'express';
+import { getJwtOptions } from 'src/constants/jwt-options.constant';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -19,8 +20,10 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
+      const { secret } = getJwtOptions(new ConfigService());
+
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtOptions.secret,
+        secret,
       });
       request['user'] = payload;
     } catch {

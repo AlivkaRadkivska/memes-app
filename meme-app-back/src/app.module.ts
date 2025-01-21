@@ -4,8 +4,11 @@ import { configValidationSchema } from './config.schema';
 import { UserModule } from './user/user.module';
 import { PublicationModule } from './publication/publication.module';
 import { AuthModule } from './auth/auth.module';
-import { getDataSourceOptions } from 'db/data-source';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { getDataSourceOptions } from './constants/data-source.constant';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { getThrottlerOptions } from './constants/throttler-options.constant';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -20,11 +23,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         return getDataSourceOptions(configService);
       },
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) =>
+        getThrottlerOptions(configService),
+    }),
     UserModule,
     PublicationModule,
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

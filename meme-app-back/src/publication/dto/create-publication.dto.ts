@@ -1,19 +1,6 @@
-import {
-  IsNotEmpty,
-  IsIn,
-  IsArray,
-  ArrayMinSize,
-  ArrayMaxSize,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, IsIn, MinLength } from 'class-validator';
 
 export class CreatePublicationDto {
-  @IsNotEmpty()
-  @IsArray()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(12)
-  @IsString({ each: true })
   pictures: string[];
 
   @IsNotEmpty()
