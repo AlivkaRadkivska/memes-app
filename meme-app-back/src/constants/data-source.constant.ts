@@ -1,8 +1,5 @@
-import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
-import { DataSource } from 'typeorm';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-config();
 
 export function getDataSourceOptions(
   configService: ConfigService,
@@ -14,12 +11,9 @@ export function getDataSourceOptions(
     username: configService.getOrThrow<string>('PGUSER'),
     password: configService.getOrThrow<string>('PGPASSWORD'),
     database: configService.getOrThrow<string>('PGDATABASE'),
-    entities: [__dirname + './../src/**/*.entity.{js,ts}'],
-    migrations: [__dirname + '/migrations/*-migration.ts'],
+    entities: [__dirname + './../**/*.entity.{js,ts}'],
+    migrations: [__dirname + '/src/db/migrations/*-migration.ts'],
     migrationsRun: true,
     synchronize: false,
   };
 }
-
-const dataSourceOptions = getDataSourceOptions(new ConfigService());
-export const AppDataSource = new DataSource(dataSourceOptions);

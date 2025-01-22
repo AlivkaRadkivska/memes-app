@@ -1,17 +1,7 @@
-import {
-  IsOptional,
-  IsIn,
-  IsArray,
-  ArrayMaxSize,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsOptional, IsIn, MinLength } from 'class-validator';
 
 export class UpdatePublicationDto {
   @IsOptional()
-  @IsArray()
-  @ArrayMaxSize(12)
-  @IsString({ each: true })
   pictures: string[];
 
   @IsOptional()
