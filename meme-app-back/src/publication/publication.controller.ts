@@ -27,8 +27,8 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 export class PublicationController {
   constructor(private publicationService: PublicationService) {}
 
-  @Post('/upload')
   @UseInterceptors(FilesInterceptor('files'))
+  @Post('/upload')
   async testUpload(
     @UploadedFiles(
       new ParseFilePipe({
@@ -49,13 +49,13 @@ export class PublicationController {
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
   getPublication(@Param('id') id: string): Promise<ShowPublicationDto> {
-    return this.publicationService.getOneById(id);
+    return this.publicationService.getOne(id);
   }
 
   @HttpCode(HttpStatus.CREATED)
-  @Post()
-  @UseInterceptors(FilesInterceptor('pictures', 12))
+  @UseInterceptors(FilesInterceptor('pictures', 8))
   @UseGuards(JwtAuthGuard)
+  @Post()
   createPublication(
     @Body() createPublicationDto: CreatePublicationDto,
     @GetUser() user: UserEntity,
@@ -73,18 +73,33 @@ export class PublicationController {
     );
   }
 
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FilesInterceptor('pictures', 8))
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   updatePublication(
     @Param('id') id: string,
     @Body() updatePublicationDto: UpdatePublicationDto,
     @GetUser() user: UserEntity,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/*' })],
+        fileIsRequired: false,
+      }),
+    )
+    pictures: Express.Multer.File[],
   ): Promise<ShowPublicationDto> {
-    return this.publicationService.updateOne(id, updatePublicationDto, user);
+    return this.publicationService.updateOne(
+      id,
+      updatePublicationDto,
+      user,
+      pictures,
+    );
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete('/:id')
   @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
   deletePublication(
     @Param('id') id: string,
     @GetUser() user: UserEntity,
