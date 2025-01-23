@@ -6,12 +6,14 @@ import { plainToInstance } from 'class-transformer';
 import { ShowCommentDto } from './dto/show-comment.dto';
 import { UserEntity } from 'src/user/user.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(CommentEntity)
     private readonly commentRepository: Repository<CommentEntity>,
+    private fileUploadService: FileUploadService,
   ) {}
 
   async getAll(): Promise<ShowCommentDto[]> {
@@ -22,8 +24,17 @@ export class CommentService {
     });
   }
 
-  async getOneById(id: string): Promise<ShowCommentDto> {
-    const comment = await this.commentRepository.findOneBy({ id });
+  async getOne(
+    id: string,
+    userId: string = undefined,
+  ): Promise<ShowCommentDto> {
+    const comment = await this.commentRepository.findOne({
+      where: [
+        { id, user: { id: userId } },
+        { id, publication: { author: { id: userId } } },
+      ],
+    });
+
     if (!comment) throw new NotFoundException('Comment not found');
 
     return plainToInstance(ShowCommentDto, comment, {
@@ -36,15 +47,24 @@ export class CommentService {
     user: UserEntity,
     picture: Express.Multer.File = undefined,
   ): Promise<ShowCommentDto> {
+    const pictureUrl = await this.fileUploadService.uploadFiles([picture]);
     const comment = this.commentRepository.create({
       ...createCommentDto,
+      picture: pictureUrl[0],
       user,
     });
     await this.commentRepository.save(comment);
-    console.log(picture);
 
     return plainToInstance(ShowCommentDto, comment, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async deleteOne(id: string, user: UserEntity): Promise<void> {
+    const comment = await this.getOne(id, user.id);
+
+    await this.fileUploadService.deleteFiles([comment.picture]);
+
+    await this.commentRepository.delete({ id: comment.id });
   }
 }

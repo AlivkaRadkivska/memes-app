@@ -34,7 +34,7 @@ export class CommentController {
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
   getComment(@Param('id') id: string): Promise<ShowCommentDto> {
-    return this.commentService.getOneById(id);
+    return this.commentService.getOne(id);
   }
 
   @HttpCode(HttpStatus.CREATED)
@@ -56,8 +56,9 @@ export class CommentController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete('/id')
-  deleteComment(@Param('id') id: string) {
-    console.log(id);
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
+  deleteComment(@Param('id') id: string, @GetUser() user: UserEntity) {
+    return this.commentService.deleteOne(id, user);
   }
 }
