@@ -9,6 +9,7 @@ import { getDataSourceOptions } from './constants/data-source.constant';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { getThrottlerOptions } from './constants/throttler-options.constant';
 import { APP_GUARD } from '@nestjs/core';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { APP_GUARD } from '@nestjs/core';
     UserModule,
     PublicationModule,
     AuthModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [

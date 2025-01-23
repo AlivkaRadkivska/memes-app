@@ -26,7 +26,7 @@ export class UserService {
     });
   }
 
-  async getOneByEmail(email: string): Promise<UserEntity> {
+  async getOneForAuth(email: string): Promise<UserEntity> {
     const user = await this.userRepository.findOneBy({ email });
     if (!user) throw new NotFoundException('User not found');
 

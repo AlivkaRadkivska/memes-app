@@ -1,15 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-
-class User {
-  @Expose()
-  id: string;
-
-  @Expose()
-  username: string;
-
-  @Expose()
-  email: string;
-}
+import { MinShowUserDto } from 'src/user/dto/min-show-user.dto';
 
 export class ShowPublicationDto {
   @Expose()
@@ -22,7 +12,13 @@ export class ShowPublicationDto {
   description: string;
 
   @Expose()
+  keywords: string[];
+
+  @Expose()
   createdAt: Date;
+
+  @Expose()
+  lastUpdatedAt: Date;
 
   @Expose()
   status: string;
@@ -37,6 +33,6 @@ export class ShowPublicationDto {
   banExpiresAt: Date;
 
   @Expose()
-  @Type(() => User)
-  author: User;
+  @Type(() => MinShowUserDto)
+  author: MinShowUserDto;
 }

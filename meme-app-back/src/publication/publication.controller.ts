@@ -27,19 +27,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 export class PublicationController {
   constructor(private publicationService: PublicationService) {}
 
-  @UseInterceptors(FilesInterceptor('files'))
-  @Post('/upload')
-  async testUpload(
-    @UploadedFiles(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'image/*' })],
-      }),
-    )
-    files: Express.Multer.File[],
-  ) {
-    return this.publicationService.uploadFiles(files);
-  }
-
   @HttpCode(HttpStatus.OK)
   @Get()
   getPublications(): Promise<ShowPublicationDto[]> {

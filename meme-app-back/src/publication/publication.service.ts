@@ -94,6 +94,7 @@ export class PublicationService {
     const updatedPublication = {
       ...publication,
       ...updatePublicationDto,
+      lastUpdatedAt: Date.now(),
       pictures: newPictures,
     };
 

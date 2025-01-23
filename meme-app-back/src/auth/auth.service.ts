@@ -25,7 +25,7 @@ export class AuthService {
   ): Promise<AuthResultDto> {
     const { email, password } = signInCredentialsDto;
 
-    const user = await this.userService.getOneByEmail(email);
+    const user = await this.userService.getOneForAuth(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       const accessToken: string = await this.generateToken(user.id, user.email);
 
@@ -68,7 +68,7 @@ export class AuthService {
     let user: ShowUserDto | UserEntity;
 
     try {
-      user = await this.userService.getOneByEmail(email);
+      user = await this.userService.getOneForAuth(email);
     } catch (error) {
       console.log(error);
       if (error.status == 404) {

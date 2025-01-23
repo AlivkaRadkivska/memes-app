@@ -1,3 +1,4 @@
+import { CommentEntity } from 'src/comment/comment.entity';
 import { PublicationEntity } from 'src/publication/publication.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -36,8 +37,15 @@ export class UserEntity {
   @Column({ name: 'ban_expires_at', nullable: true })
   banExpiresAt?: Date;
 
+  // Relations
+
   @OneToMany(() => PublicationEntity, (publication) => publication.author, {
     eager: false,
   })
   publications: PublicationEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user, {
+    eager: false,
+  })
+  comments: CommentEntity[];
 }
