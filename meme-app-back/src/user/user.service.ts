@@ -17,7 +17,11 @@ export class UserService {
   ) {}
 
   async getAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ['followers', 'followings'],
+    });
+
+    return users;
   }
 
   async getOne(
@@ -25,6 +29,7 @@ export class UserService {
     email: string = undefined,
   ): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
+      relations: ['followers', 'followings'],
       where: [{ id }, { email }],
     });
     if (!user) throw new NotFoundException('User not found');

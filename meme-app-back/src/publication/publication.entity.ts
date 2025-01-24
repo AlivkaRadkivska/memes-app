@@ -24,6 +24,9 @@ export class PublicationEntity {
   @Column()
   description: string;
 
+  @Column('text', { array: true })
+  keywords: string[];
+
   @Transform(({ value }) => {
     return {
       id: value.id,

@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { CommentModule } from './comment/comment.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { LikeModule } from './like/like.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { LikeModule } from './like/like.module';
     CommentModule,
     FileUploadModule,
     LikeModule,
+    FollowModule,
   ],
   controllers: [],
   providers: [
