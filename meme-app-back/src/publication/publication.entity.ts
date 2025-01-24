@@ -1,7 +1,11 @@
-import { IsIn } from 'class-validator';
+import { IsIn, IsInt } from 'class-validator';
 import { CommentEntity } from 'src/comment/comment.entity';
+import { LikeEntity } from 'src/like/like.entity';
 import { UserEntity } from 'src/user/user.entity';
 import {
+  AfterInsert,
+  AfterLoad,
+  AfterUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -52,8 +56,38 @@ export class PublicationEntity {
 
   // Relations
 
-  @OneToMany(() => CommentEntity, (comment) => comment.user, {
+  @OneToMany(() => CommentEntity, (comment) => comment.publication, {
     eager: false,
   })
   comments: CommentEntity[];
+
+  @OneToMany(() => LikeEntity, (like) => like.publication, {
+    eager: false,
+  })
+  likes: LikeEntity[];
+
+  // Virtual
+
+  @IsInt()
+  likesCount: number;
+
+  @AfterLoad()
+  @AfterInsert()
+  @AfterUpdate()
+  getLikesCount(): void {
+    this.likesCount = this.likes ? this.likes.length : 0;
+    return;
+  }
+
+  isLiked: boolean;
+
+  @AfterLoad()
+  setIsLiked(user?: UserEntity) {
+    if (!user) {
+      this.isLiked = false;
+      return;
+    }
+
+    this.isLiked = this.likes.some((like) => like.user.id === user.id);
+  }
 }

@@ -1,4 +1,5 @@
 import { CommentEntity } from 'src/comment/comment.entity';
+import { LikeEntity } from 'src/like/like.entity';
 import { PublicationEntity } from 'src/publication/publication.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -48,4 +49,9 @@ export class UserEntity {
     eager: false,
   })
   comments: CommentEntity[];
+
+  @OneToMany(() => LikeEntity, (like) => like.user, {
+    eager: false,
+  })
+  likes: LikeEntity[];
 }

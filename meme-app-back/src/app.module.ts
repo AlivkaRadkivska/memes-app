@@ -11,6 +11,7 @@ import { getThrottlerOptions } from './constants/throttler-options.constant';
 import { APP_GUARD } from '@nestjs/core';
 import { CommentModule } from './comment/comment.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     AuthModule,
     CommentModule,
     FileUploadModule,
+    LikeModule,
   ],
   controllers: [],
   providers: [

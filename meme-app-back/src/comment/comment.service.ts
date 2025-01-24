@@ -19,6 +19,7 @@ export class CommentService {
   async getAll(): Promise<ShowCommentDto[]> {
     const comments = await this.commentRepository.find();
 
+    console.log(comments);
     return plainToInstance(ShowCommentDto, comments, {
       excludeExtraneousValues: true,
     });
@@ -47,12 +48,16 @@ export class CommentService {
     user: UserEntity,
     picture: Express.Multer.File = undefined,
   ): Promise<ShowCommentDto> {
-    const pictureUrl = await this.fileUploadService.uploadFiles([picture]);
     const comment = this.commentRepository.create({
       ...createCommentDto,
-      picture: pictureUrl[0],
       user,
     });
+
+    if (picture) {
+      const pictureUrl = await this.fileUploadService.uploadFiles([picture]);
+      comment.picture = pictureUrl[0];
+    }
+
     await this.commentRepository.save(comment);
 
     return plainToInstance(ShowCommentDto, comment, {

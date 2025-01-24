@@ -22,15 +22,17 @@ import { ShowPublicationDto } from 'src/publication/dto/show-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
 
 @Controller('publication')
 export class PublicationController {
   constructor(private publicationService: PublicationService) {}
 
   @HttpCode(HttpStatus.OK)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
-  getPublications(): Promise<ShowPublicationDto[]> {
-    return this.publicationService.getAll();
+  getPublications(@GetUser() user: UserEntity = undefined) {
+    return this.publicationService.getAll(user);
   }
 
   @HttpCode(HttpStatus.OK)

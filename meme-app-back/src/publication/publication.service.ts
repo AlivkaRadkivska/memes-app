@@ -17,10 +17,12 @@ export class PublicationService {
     private fileUploadService: FileUploadService,
   ) {}
 
-  async getAll(): Promise<ShowPublicationDto[]> {
+  async getAll(user: UserEntity = undefined) {
     const publications = await this.publicationRepository.find({
-      relations: ['author'],
+      relations: ['author', 'likes'],
     });
+
+    publications.forEach((publication) => publication.setIsLiked(user));
 
     return plainToInstance(ShowPublicationDto, publications, {
       excludeExtraneousValues: true,

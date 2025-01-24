@@ -1,20 +1,9 @@
 import { Expose, Type } from 'class-transformer';
 import { MinShowUserDto } from 'src/user/dto/min-show-user.dto';
 
-export class PublicationId {
+export class ShowLikeDto {
   @Expose()
   id: string;
-}
-
-export class ShowCommentDto {
-  @Expose()
-  id: string;
-
-  @Expose()
-  picture?: string;
-
-  @Expose()
-  text: string;
 
   @Expose()
   createdAt: Date;
@@ -24,6 +13,11 @@ export class ShowCommentDto {
   user: MinShowUserDto;
 
   @Expose()
-  @Type(() => PublicationId)
-  publication: PublicationId;
+  @Type(
+    () =>
+      class {
+        id: string;
+      },
+  )
+  publication: { id: string };
 }

@@ -33,9 +33,7 @@ export class FileUploadService {
       return res.map((file) => file.data.url);
     } catch (error) {
       console.error('Upload failed:', error);
-      throw new InternalServerErrorException(
-        'Something went wrong. Please try later',
-      );
+      throw new InternalServerErrorException();
     }
   }
 
@@ -46,9 +44,7 @@ export class FileUploadService {
       await this.utApi.deleteFiles(fileKeys);
     } catch (error) {
       console.error('Deleting failed:', error);
-      throw new InternalServerErrorException(
-        'Something went wrong. Please try later',
-      );
+      throw new InternalServerErrorException();
     }
   }
 

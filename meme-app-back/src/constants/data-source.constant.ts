@@ -12,7 +12,7 @@ export function getDataSourceOptions(
     password: configService.getOrThrow<string>('PGPASSWORD'),
     database: configService.getOrThrow<string>('PGDATABASE'),
     entities: [__dirname + '/../**/*.entity.{js,ts}'],
-    migrations: [__dirname + '/src/db/migrations/*-migration.ts'],
+    migrations: [__dirname + './../../db/migrations/*-migration.ts'],
     migrationsRun: true,
     synchronize: false,
   };

@@ -35,4 +35,10 @@ export class ShowPublicationDto {
   @Expose()
   @Type(() => MinShowUserDto)
   author: MinShowUserDto;
+
+  @Expose()
+  likesCount: number;
+
+  @Expose()
+  isLiked: boolean;
 }
