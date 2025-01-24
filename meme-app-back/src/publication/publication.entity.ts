@@ -1,11 +1,10 @@
+import { Exclude, Transform } from 'class-transformer';
 import { IsIn, IsInt } from 'class-validator';
 import { CommentEntity } from 'src/comment/comment.entity';
 import { LikeEntity } from 'src/like/like.entity';
 import { UserEntity } from 'src/user/user.entity';
 import {
-  AfterInsert,
   AfterLoad,
-  AfterUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -25,9 +24,13 @@ export class PublicationEntity {
   @Column()
   description: string;
 
-  @Column('text', { array: true })
-  keywords: string[];
-
+  @Transform(({ value }) => {
+    return {
+      id: value.id,
+      username: value.username,
+      email: value.email,
+    };
+  })
   @ManyToOne(() => UserEntity, (user) => user.publications, {
     eager: true,
     onDelete: 'CASCADE',
@@ -56,33 +59,31 @@ export class PublicationEntity {
 
   // Relations
 
-  @OneToMany(() => CommentEntity, (comment) => comment.publication, {
-    eager: false,
-  })
+  @Exclude()
+  @OneToMany(() => CommentEntity, (comment) => comment.publication)
   comments: CommentEntity[];
 
-  @OneToMany(() => LikeEntity, (like) => like.publication, {
-    eager: false,
-  })
+  @Exclude()
+  @OneToMany(() => LikeEntity, (like) => like.publication)
   likes: LikeEntity[];
 
   // Virtual
 
   @IsInt()
-  likesCount: number;
+  likeCount: number;
 
-  @AfterLoad()
-  @AfterInsert()
-  @AfterUpdate()
-  getLikesCount(): void {
-    this.likesCount = this.likes ? this.likes.length : 0;
-    return;
-  }
+  @IsInt()
+  commentCount: number;
 
   isLiked: boolean;
 
   @AfterLoad()
-  setIsLiked(user?: UserEntity) {
+  getCounts(): void {
+    this.commentCount = this.comments ? this.comments.length : 0;
+    this.likeCount = this.likes ? this.likes.length : 0;
+  }
+
+  setIsLiked(user?: UserEntity): void {
     if (!user) {
       this.isLiked = false;
       return;

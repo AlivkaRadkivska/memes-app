@@ -12,6 +12,7 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserEntity } from 'src/user/user.entity';
 import { LikeService } from './like.service';
+import { LikeEntity } from './like.entity';
 
 @Controller('like')
 export class LikeController {
@@ -19,7 +20,7 @@ export class LikeController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getLikes() {
+  getLikes(): Promise<LikeEntity[]> {
     return this.likeService.getAll();
   }
 
@@ -29,7 +30,7 @@ export class LikeController {
   createLike(
     @Param('publicationId') publicationId: string,
     @GetUser() user: UserEntity,
-  ) {
+  ): Promise<LikeEntity> {
     return this.likeService.createOne(publicationId, user);
   }
 
@@ -39,7 +40,7 @@ export class LikeController {
   deleteLike(
     @Param('publicationId') publicationId: string,
     @GetUser() user: UserEntity,
-  ) {
+  ): Promise<void> {
     return this.likeService.deleteOne(publicationId, user);
   }
 }

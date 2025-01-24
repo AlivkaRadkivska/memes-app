@@ -18,11 +18,11 @@ import { PublicationService } from './publication.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserEntity } from 'src/user/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { ShowPublicationDto } from 'src/publication/dto/show-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
+import { PublicationEntity } from './publication.entity';
 
 @Controller('publication')
 export class PublicationController {
@@ -31,13 +31,15 @@ export class PublicationController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(OptionalJwtAuthGuard)
   @Get()
-  getPublications(@GetUser() user: UserEntity = undefined) {
+  getPublications(
+    @GetUser() user: UserEntity = undefined,
+  ): Promise<PublicationEntity[]> {
     return this.publicationService.getAll(user);
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  getPublication(@Param('id') id: string): Promise<ShowPublicationDto> {
+  getPublication(@Param('id') id: string): Promise<PublicationEntity> {
     return this.publicationService.getOne(id);
   }
 
@@ -54,7 +56,7 @@ export class PublicationController {
       }),
     )
     pictures: Express.Multer.File[],
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     return this.publicationService.createOne(
       createPublicationDto,
       user,
@@ -77,7 +79,7 @@ export class PublicationController {
       }),
     )
     pictures: Express.Multer.File[],
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     return this.publicationService.updateOne(
       id,
       updatePublicationDto,

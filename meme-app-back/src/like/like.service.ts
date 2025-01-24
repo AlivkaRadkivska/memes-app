@@ -4,10 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
 import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
-import { ShowLikeDto } from './dto/show-like.dto';
 import { LikeEntity } from './like.entity';
 
 @Injectable()
@@ -17,18 +15,14 @@ export class LikeService {
     private readonly likeRepository: Repository<LikeEntity>,
   ) {}
 
-  async getAll(): Promise<ShowLikeDto[]> {
-    const likes = await this.likeRepository.find();
-
-    return plainToInstance(ShowLikeDto, likes, {
-      excludeExtraneousValues: true,
-    });
+  async getAll(): Promise<LikeEntity[]> {
+    return await this.likeRepository.find();
   }
 
   async createOne(
     publicationId: string,
     user: UserEntity,
-  ): Promise<ShowLikeDto> {
+  ): Promise<LikeEntity> {
     try {
       const like = this.likeRepository.create({
         publication: { id: publicationId },
@@ -36,9 +30,7 @@ export class LikeService {
       });
       await this.likeRepository.save(like);
 
-      return plainToInstance(ShowLikeDto, like, {
-        excludeExtraneousValues: true,
-      });
+      return like;
     } catch (error) {
       if (error.code == 23505) throw new ConflictException(['Like exists']);
       else {

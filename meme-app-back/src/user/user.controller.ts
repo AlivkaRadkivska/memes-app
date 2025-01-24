@@ -7,7 +7,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ShowUserDto } from './dto/show-user.dto';
+import { UserEntity } from './user.entity';
 
 @Controller('user')
 export class UserController {
@@ -15,14 +15,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getAll(): Promise<ShowUserDto[]> {
+  getAll(): Promise<UserEntity[]> {
     return this.userService.getAll();
   }
 
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  getById(@Param() id: string): Promise<ShowUserDto> {
-    return this.userService.getOneById(id);
+  getById(@Param() id: string): Promise<UserEntity> {
+    return this.userService.getOne(id);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

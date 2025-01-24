@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { PublicationEntity } from 'src/publication/publication.entity';
 import { UserEntity } from 'src/user/user.entity';
 import {
@@ -19,15 +20,21 @@ export class CommentEntity {
   @Column({ nullable: true })
   picture?: string;
 
+  @Transform(({ value }) => {
+    return {
+      id: value.id,
+      username: value.username,
+      email: value.email,
+    };
+  })
   @ManyToOne(() => UserEntity, (user) => user.comments, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
+  @Transform(({ value }) => value.id)
   @ManyToOne(() => PublicationEntity, (publication) => publication.comments, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'publication_id' })

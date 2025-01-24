@@ -19,7 +19,7 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { UserEntity } from 'src/user/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { ShowCommentDto } from './dto/show-comment.dto';
+import { CommentEntity } from './comment.entity';
 
 @Controller('comment')
 export class CommentController {
@@ -27,13 +27,13 @@ export class CommentController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getComments(): Promise<ShowCommentDto[]> {
+  getComments(): Promise<CommentEntity[]> {
     return this.commentService.getAll();
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  getComment(@Param('id') id: string): Promise<ShowCommentDto> {
+  getComment(@Param('id') id: string): Promise<CommentEntity> {
     return this.commentService.getOne(id);
   }
 
@@ -51,14 +51,17 @@ export class CommentController {
       }),
     )
     picture: Express.Multer.File,
-  ): Promise<ShowCommentDto> {
+  ): Promise<CommentEntity> {
     return this.commentService.createOne(createCommentDto, user, picture);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
-  deleteComment(@Param('id') id: string, @GetUser() user: UserEntity) {
+  deleteComment(
+    @Param('id') id: string,
+    @GetUser() user: UserEntity,
+  ): Promise<void> {
     return this.commentService.deleteOne(id, user);
   }
 }

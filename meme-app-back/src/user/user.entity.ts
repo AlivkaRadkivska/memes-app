@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { CommentEntity } from 'src/comment/comment.entity';
 import { LikeEntity } from 'src/like/like.entity';
 import { PublicationEntity } from 'src/publication/publication.entity';
@@ -14,6 +15,7 @@ export class UserEntity {
   @Column()
   username: string;
 
+  @Exclude({ toPlainOnly: true })
   @Column({ nullable: true })
   password?: string;
 
@@ -40,18 +42,12 @@ export class UserEntity {
 
   // Relations
 
-  @OneToMany(() => PublicationEntity, (publication) => publication.author, {
-    eager: false,
-  })
+  @OneToMany(() => PublicationEntity, (publication) => publication.author)
   publications: PublicationEntity[];
 
-  @OneToMany(() => CommentEntity, (comment) => comment.user, {
-    eager: false,
-  })
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
   comments: CommentEntity[];
 
-  @OneToMany(() => LikeEntity, (like) => like.user, {
-    eager: false,
-  })
+  @OneToMany(() => LikeEntity, (like) => like.user)
   likes: LikeEntity[];
 }

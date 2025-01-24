@@ -4,8 +4,6 @@ import { PublicationEntity } from './publication.entity';
 import { Repository } from 'typeorm';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UserEntity } from 'src/user/user.entity';
-import { ShowPublicationDto } from 'src/publication/dto/show-publication.dto';
-import { plainToInstance } from 'class-transformer';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 
@@ -17,22 +15,20 @@ export class PublicationService {
     private fileUploadService: FileUploadService,
   ) {}
 
-  async getAll(user: UserEntity = undefined) {
+  async getAll(user: UserEntity = undefined): Promise<PublicationEntity[]> {
     const publications = await this.publicationRepository.find({
-      relations: ['author', 'likes'],
+      relations: ['likes', 'comments'],
     });
 
     publications.forEach((publication) => publication.setIsLiked(user));
 
-    return plainToInstance(ShowPublicationDto, publications, {
-      excludeExtraneousValues: true,
-    });
+    return publications;
   }
 
   async getOne(
     id: string,
     authorId: string = undefined,
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     const publication = await this.publicationRepository.findOne({
       relations: ['author'],
       where: { id, author: { id: authorId } },
@@ -40,16 +36,14 @@ export class PublicationService {
 
     if (!publication) throw new NotFoundException('Publication was not found');
 
-    return plainToInstance(ShowPublicationDto, publication, {
-      excludeExtraneousValues: true,
-    });
+    return publication;
   }
 
   async createOne(
     createPublicationDto: CreatePublicationDto,
     user: UserEntity,
     pictures: Express.Multer.File[],
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     const pictureUrls = await this.fileUploadService.uploadFiles(pictures);
 
     const publication = this.publicationRepository.create({
@@ -59,9 +53,7 @@ export class PublicationService {
     });
     await this.publicationRepository.save(publication);
 
-    return plainToInstance(ShowPublicationDto, publication, {
-      excludeExtraneousValues: true,
-    });
+    return publication;
   }
 
   async updateOne(
@@ -69,7 +61,7 @@ export class PublicationService {
     updatePublicationDto: UpdatePublicationDto,
     user: UserEntity,
     pictures: Express.Multer.File[] = undefined,
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     const publication = await this.getOne(id, user.id);
 
     const newPictures =
@@ -89,16 +81,13 @@ export class PublicationService {
 
     await this.publicationRepository.save(updatedPublication);
 
-    return plainToInstance(ShowPublicationDto, updatedPublication, {
-      excludeExtraneousValues: true,
-    });
+    return publication;
   }
 
   async deleteOne(id: string, user: UserEntity): Promise<void> {
     const publication = await this.getOne(id, user.id);
 
     await this.fileUploadService.deleteFiles(publication.pictures);
-
     await this.publicationRepository.delete({ id, author: user });
   }
 }

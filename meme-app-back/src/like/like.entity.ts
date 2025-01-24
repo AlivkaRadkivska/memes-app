@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { PublicationEntity } from 'src/publication/publication.entity';
 import { UserEntity } from 'src/user/user.entity';
 import {
@@ -15,6 +16,7 @@ export class LikeEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Transform(({ value }) => value.id)
   @ManyToOne(() => UserEntity, (user) => user.likes, {
     eager: true,
     onDelete: 'CASCADE',
@@ -22,6 +24,7 @@ export class LikeEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
+  @Transform(({ value }) => value.id)
   @ManyToOne(() => PublicationEntity, (publication) => publication.likes, {
     eager: true,
     onDelete: 'CASCADE',

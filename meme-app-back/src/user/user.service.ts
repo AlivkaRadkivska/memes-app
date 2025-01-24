@@ -8,8 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ShowUserDto } from './dto/show-user.dto';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -18,38 +16,28 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async getAll(): Promise<ShowUserDto[]> {
-    const users = await this.userRepository.find();
-
-    return plainToInstance(ShowUserDto, users, {
-      excludeExtraneousValues: true,
-    });
+  async getAll(): Promise<UserEntity[]> {
+    return await this.userRepository.find();
   }
 
-  async getOneForAuth(email: string): Promise<UserEntity> {
-    const user = await this.userRepository.findOneBy({ email });
+  async getOne(
+    id: string = undefined,
+    email: string = undefined,
+  ): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: [{ id }, { email }],
+    });
     if (!user) throw new NotFoundException('User not found');
 
     return user;
   }
 
-  async getOneById(id: string): Promise<ShowUserDto> {
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) throw new NotFoundException('User not found');
-
-    return plainToInstance(ShowUserDto, user, {
-      excludeExtraneousValues: true,
-    });
-  }
-
-  async createOne(createUserDto: CreateUserDto): Promise<ShowUserDto> {
+  async createOne(createUserDto: CreateUserDto): Promise<UserEntity> {
     try {
       const user = this.userRepository.create(createUserDto);
       await this.userRepository.save(user);
 
-      return plainToInstance(ShowUserDto, user, {
-        excludeExtraneousValues: true,
-      });
+      return user;
     } catch (error) {
       if (error.code == 23505)
         throw new ConflictException(['Email is already taken']);
