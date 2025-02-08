@@ -6,6 +6,7 @@ import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UserEntity } from 'src/user/user.entity';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { PublicationFiltersDto } from './dto/publication-filters.dto';
 
 @Injectable()
 export class PublicationService {
@@ -15,20 +16,67 @@ export class PublicationService {
     private fileUploadService: FileUploadService,
   ) {}
 
-  async getAll(user: UserEntity = undefined): Promise<PublicationEntity[]> {
-    const publications = await this.publicationRepository.find({
-      relations: ['likes', 'comments'],
-    });
+  async getAll(
+    user?: UserEntity,
+    filters?: PublicationFiltersDto,
+  ): Promise<PublicationEntity[]> {
+    const query = this.publicationRepository
+      .createQueryBuilder('publication')
+      .leftJoinAndSelect('publication.likes', 'likes')
+      .leftJoinAndSelect('publication.comments', 'comments')
+      .leftJoinAndSelect('publication.author', 'author');
 
+    if (filters?.keywords && filters.keywords.length > 0) {
+      query.andWhere(
+        'EXISTS (SELECT 1 FROM unnest(publication.keywords) keyword WHERE keyword ILIKE ANY(:keywords))',
+        {
+          keywords: filters.keywords
+            .split(',')
+            .map((keyword) => `%${keyword}%`),
+        },
+      );
+    }
+
+    if (filters?.status) {
+      query.andWhere('publication.status = :status', {
+        status: filters.status,
+      });
+    }
+
+    if (filters?.isBanned !== undefined) {
+      query.andWhere('publication.isBanned = :isBanned', {
+        isBanned: filters.isBanned,
+      });
+    }
+
+    if (filters?.search) {
+      query.andWhere(
+        '(LOWER(publication.description) LIKE LOWER(:search) OR EXISTS (SELECT 1 FROM unnest(publication.keywords) keyword WHERE LOWER(keyword) LIKE LOWER(:search)))',
+        { search: `%${filters.search}%` },
+      );
+    }
+
+    if (filters?.author) {
+      query.andWhere(
+        'LOWER(author.username) LIKE LOWER(:author) OR LOWER(author.full_name) LIKE LOWER(:author) OR LOWER(author.email) LIKE LOWER(:author)',
+        { author: `%${filters.author}%` },
+      );
+    }
+
+    if (filters?.createdAtDesc !== undefined) {
+      query.orderBy(
+        'publication.createdAt',
+        filters.createdAtDesc ? 'DESC' : 'ASC',
+      );
+    }
+
+    const publications = await query.getMany();
     publications.forEach((publication) => publication.setIsLiked(user));
 
     return publications;
   }
 
-  async getOne(
-    id: string,
-    authorId: string = undefined,
-  ): Promise<PublicationEntity> {
+  async getOne(id: string, authorId?: string): Promise<PublicationEntity> {
     const publication = await this.publicationRepository.findOne({
       relations: ['author'],
       where: { id, author: { id: authorId } },
@@ -60,7 +108,7 @@ export class PublicationService {
     id: string,
     updatePublicationDto: UpdatePublicationDto,
     user: UserEntity,
-    pictures: Express.Multer.File[] = undefined,
+    pictures?: Express.Multer.File[],
   ): Promise<PublicationEntity> {
     const publication = await this.getOne(id, user.id);
 

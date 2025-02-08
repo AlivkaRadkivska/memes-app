@@ -24,10 +24,7 @@ export class UserService {
     return users;
   }
 
-  async getOne(
-    id: string = undefined,
-    email: string = undefined,
-  ): Promise<UserEntity> {
+  async getOne(id?: string, email?: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       relations: ['followers', 'followings'],
       where: [{ id }, { email }],

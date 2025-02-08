@@ -10,6 +10,7 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -23,6 +24,7 @@ import { CreatePublicationDto } from './dto/create-publication.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
 import { PublicationEntity } from './publication.entity';
+import { PublicationFiltersDto } from './dto/publication-filters.dto';
 
 @Controller('publication')
 export class PublicationController {
@@ -32,9 +34,10 @@ export class PublicationController {
   @UseGuards(OptionalJwtAuthGuard)
   @Get()
   getPublications(
-    @GetUser() user: UserEntity = undefined,
+    @GetUser() user?: UserEntity,
+    @Query() filters?: PublicationFiltersDto,
   ): Promise<PublicationEntity[]> {
-    return this.publicationService.getAll(user);
+    return this.publicationService.getAll(user, filters);
   }
 
   @HttpCode(HttpStatus.OK)

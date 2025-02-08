@@ -49,7 +49,7 @@ export class UserEntity {
   banExpiresAt?: Date;
 
   // Relations
-
+  @Exclude({ toPlainOnly: true })
   @OneToMany(() => PublicationEntity, (publication) => publication.author)
   publications: PublicationEntity[];
 

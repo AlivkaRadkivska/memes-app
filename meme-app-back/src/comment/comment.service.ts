@@ -20,7 +20,7 @@ export class CommentService {
     });
   }
 
-  async getOne(id: string, userId: string = undefined): Promise<CommentEntity> {
+  async getOne(id: string, userId?: string): Promise<CommentEntity> {
     const comment = await this.commentRepository.findOne({
       where: [
         { id, user: { id: userId } },
@@ -36,7 +36,7 @@ export class CommentService {
   async createOne(
     createCommentDto: CreateCommentDto,
     user: UserEntity,
-    picture: Express.Multer.File = undefined,
+    picture?: Express.Multer.File,
   ): Promise<CommentEntity> {
     const comment = this.commentRepository.create({
       ...createCommentDto,

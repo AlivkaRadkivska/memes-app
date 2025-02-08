@@ -31,6 +31,7 @@ export class PublicationEntity {
     return {
       id: value.id,
       username: value.username,
+      fullName: value.fullName,
       email: value.email,
     };
   })
