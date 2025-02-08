@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -11,7 +12,6 @@ import { SignInCredentialsDto } from './dto/sign-in-credentials.dto';
 import { SignUpCredentialsDto } from './dto/sign-up-credentials.dto';
 import { Profile } from 'passport';
 import { UserEntity } from 'src/user/user.entity';
-import { ShowUserDto } from 'src/user/dto/show-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +25,7 @@ export class AuthService {
   ): Promise<AuthResultDto> {
     const { email, password } = signInCredentialsDto;
 
-    const user = await this.userService.getOneByEmail(email);
+    const user = await this.userService.getOne(undefined, email);
     if (user && (await bcrypt.compare(password, user.password))) {
       const accessToken: string = await this.generateToken(user.id, user.email);
 
@@ -43,7 +43,12 @@ export class AuthService {
   async signUp(
     signUpCredentialsDto: SignUpCredentialsDto,
   ): Promise<AuthResultDto> {
-    const { password } = signUpCredentialsDto;
+    const { password, repeatPassword } = signUpCredentialsDto;
+
+    if (password != repeatPassword)
+      throw new BadRequestException(
+        'Password confirmation does not match password',
+      );
 
     const hashedPassword = await this.getHashedPassword(password);
 
@@ -65,12 +70,12 @@ export class AuthService {
 
   async loginWithGoogle(profile: Profile): Promise<AuthResultDto> {
     const email = profile.emails[0]?.value;
-    let user: ShowUserDto | UserEntity;
+    let user: UserEntity | UserEntity;
 
     try {
-      user = await this.userService.getOneByEmail(email);
+      user = await this.userService.getOne(undefined, email);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       if (error.status == 404) {
         user = await this.userService.createOne({
           email,
@@ -80,7 +85,7 @@ export class AuthService {
           password: null,
         });
       } else {
-        console.log(error);
+        console.error(error);
         throw new InternalServerErrorException();
       }
     }

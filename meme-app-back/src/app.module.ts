@@ -9,6 +9,10 @@ import { getDataSourceOptions } from './constants/data-source.constant';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { getThrottlerOptions } from './constants/throttler-options.constant';
 import { APP_GUARD } from '@nestjs/core';
+import { CommentModule } from './comment/comment.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { LikeModule } from './like/like.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { APP_GUARD } from '@nestjs/core';
     UserModule,
     PublicationModule,
     AuthModule,
+    CommentModule,
+    FileUploadModule,
+    LikeModule,
+    FollowModule,
   ],
   controllers: [],
   providers: [

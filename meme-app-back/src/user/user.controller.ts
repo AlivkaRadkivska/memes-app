@@ -5,9 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ShowUserDto } from './dto/show-user.dto';
+import { UserEntity } from './user.entity';
+import { UserFiltersDto } from './dto/user-filters.dto';
 
 @Controller('user')
 export class UserController {
@@ -15,14 +17,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getAll(): Promise<ShowUserDto[]> {
-    return this.userService.getAll();
+  getAll(@Query() filters?: UserFiltersDto): Promise<UserEntity[]> {
+    return this.userService.getAll(filters);
   }
 
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  getById(@Param() id: string): Promise<ShowUserDto> {
-    return this.userService.getOneById(id);
+  getById(@Param() id: string): Promise<UserEntity> {
+    return this.userService.getOne(id);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

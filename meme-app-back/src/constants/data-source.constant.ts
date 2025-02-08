@@ -11,8 +11,8 @@ export function getDataSourceOptions(
     username: configService.getOrThrow<string>('PGUSER'),
     password: configService.getOrThrow<string>('PGPASSWORD'),
     database: configService.getOrThrow<string>('PGDATABASE'),
-    entities: [__dirname + './../**/*.entity.{js,ts}'],
-    migrations: [__dirname + '/src/db/migrations/*-migration.ts'],
+    entities: [__dirname + '/../**/*.entity.{js,ts}'],
+    migrations: [__dirname + './../../db/migrations/*-migration.ts'],
     migrationsRun: true,
     synchronize: false,
   };

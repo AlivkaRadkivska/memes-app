@@ -10,6 +10,7 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -18,37 +19,30 @@ import { PublicationService } from './publication.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserEntity } from 'src/user/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { ShowPublicationDto } from 'src/publication/dto/show-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
+import { PublicationEntity } from './publication.entity';
+import { PublicationFiltersDto } from './dto/publication-filters.dto';
 
 @Controller('publication')
 export class PublicationController {
   constructor(private publicationService: PublicationService) {}
 
-  @UseInterceptors(FilesInterceptor('files'))
-  @Post('/upload')
-  async testUpload(
-    @UploadedFiles(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'image/*' })],
-      }),
-    )
-    files: Express.Multer.File[],
-  ) {
-    return this.publicationService.uploadFiles(files);
-  }
-
   @HttpCode(HttpStatus.OK)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get()
-  getPublications(): Promise<ShowPublicationDto[]> {
-    return this.publicationService.getAll();
+  getPublications(
+    @GetUser() user?: UserEntity,
+    @Query() filters?: PublicationFiltersDto,
+  ): Promise<PublicationEntity[]> {
+    return this.publicationService.getAll(user, filters);
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  getPublication(@Param('id') id: string): Promise<ShowPublicationDto> {
+  getPublication(@Param('id') id: string): Promise<PublicationEntity> {
     return this.publicationService.getOne(id);
   }
 
@@ -65,7 +59,7 @@ export class PublicationController {
       }),
     )
     pictures: Express.Multer.File[],
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     return this.publicationService.createOne(
       createPublicationDto,
       user,
@@ -88,7 +82,7 @@ export class PublicationController {
       }),
     )
     pictures: Express.Multer.File[],
-  ): Promise<ShowPublicationDto> {
+  ): Promise<PublicationEntity> {
     return this.publicationService.updateOne(
       id,
       updatePublicationDto,

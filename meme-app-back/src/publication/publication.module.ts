@@ -3,11 +3,11 @@ import { PublicationService } from './publication.service';
 import { PublicationController } from './publication.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PublicationEntity } from './publication.entity';
-import { UTApi } from 'uploadthing/server';
+import { FileUploadModule } from 'src/file-upload/file-upload.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PublicationEntity])],
-  providers: [PublicationService, UTApi],
+  imports: [TypeOrmModule.forFeature([PublicationEntity]), FileUploadModule],
+  providers: [PublicationService],
   controllers: [PublicationController],
   exports: [PublicationService],
 })
