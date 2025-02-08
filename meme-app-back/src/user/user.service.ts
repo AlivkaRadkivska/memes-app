@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserFiltersDto } from './dto/user-filters.dto';
 
 @Injectable()
 export class UserService {
@@ -16,10 +17,41 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async getAll(): Promise<UserEntity[]> {
-    const users = await this.userRepository.find({
-      relations: ['followers', 'followings'],
-    });
+  async getAll(filters?: UserFiltersDto): Promise<UserEntity[]> {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.followers', 'followers')
+      .leftJoinAndSelect('user.followings', 'followings');
+
+    if (filters?.isBanned !== undefined) {
+      query.andWhere('user.isBanned = :isBanned', {
+        isBanned: filters.isBanned,
+      });
+    }
+
+    if (filters?.email) {
+      query.andWhere('LOWER(user.email) LIKE LOWER(:email)', {
+        email: `%${filters.email}%`,
+      });
+    }
+
+    if (filters?.name) {
+      query.andWhere(
+        'LOWER(user.username) LIKE LOWER(:name) OR LOWER(user.fullName) LIKE LOWER(:name)',
+        {
+          name: `%${filters.name}%`,
+        },
+      );
+    }
+
+    if (filters?.search) {
+      query.andWhere(
+        'LOWER(user.username) LIKE LOWER(:search) OR LOWER(user.full_name) LIKE LOWER(:search) OR LOWER(user.email) LIKE LOWER(:search) OR LOWER(user.signature) LIKE LOWER(:search)',
+        { search: `%${filters.search}%` },
+      );
+    }
+
+    const users = await query.getMany();
 
     return users;
   }
@@ -44,7 +76,7 @@ export class UserService {
       if (error.code == 23505)
         throw new ConflictException(['Email is already taken']);
       else {
-        console.log(error);
+        console.error(error);
         throw new InternalServerErrorException();
       }
     }

@@ -39,7 +39,7 @@ export class FollowService {
       if (error.code == 23505)
         throw new ConflictException(['Already following']);
       else {
-        console.log(error);
+        console.error(error);
         throw new InternalServerErrorException();
       }
     }

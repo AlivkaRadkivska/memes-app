@@ -75,7 +75,7 @@ export class AuthService {
     try {
       user = await this.userService.getOne(undefined, email);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       if (error.status == 404) {
         user = await this.userService.createOne({
           email,
@@ -85,7 +85,7 @@ export class AuthService {
           password: null,
         });
       } else {
-        console.log(error);
+        console.error(error);
         throw new InternalServerErrorException();
       }
     }

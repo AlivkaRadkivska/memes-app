@@ -5,9 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
+import { UserFiltersDto } from './dto/user-filters.dto';
 
 @Controller('user')
 export class UserController {
@@ -15,8 +17,8 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getAll(): Promise<UserEntity[]> {
-    return this.userService.getAll();
+  getAll(@Query() filters?: UserFiltersDto): Promise<UserEntity[]> {
+    return this.userService.getAll(filters);
   }
 
   @HttpCode(HttpStatus.OK)

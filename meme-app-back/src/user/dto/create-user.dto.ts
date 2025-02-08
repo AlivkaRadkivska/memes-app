@@ -20,5 +20,5 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsIn(['user', 'moderator'])
-  role: string;
+  role: 'user' | 'moderator';
 }

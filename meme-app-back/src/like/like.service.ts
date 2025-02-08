@@ -34,7 +34,7 @@ export class LikeService {
     } catch (error) {
       if (error.code == 23505) throw new ConflictException(['Like exists']);
       else {
-        console.log(error);
+        console.error(error);
         throw new InternalServerErrorException();
       }
     }
