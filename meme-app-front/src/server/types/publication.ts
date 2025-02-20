@@ -1,14 +1,16 @@
+interface Author {
+  id: string;
+  username: string;
+  fullName: string;
+  email: string;
+}
+
 export interface Publication {
   id: string;
   pictures: string[];
   description: string;
   keywords: string[];
-  author: {
-    id: string;
-    username: string;
-    fullName: string;
-    email: string;
-  };
+  author: Author;
   createdAt: Date;
   lastUpdatedAt: Date;
   status: string;

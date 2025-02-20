@@ -1,4 +1,4 @@
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/site-layout/header';
 
 export default function SiteLayout({
   children,
@@ -8,7 +8,7 @@ export default function SiteLayout({
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">{children}</main>
     </>
   );
 }
