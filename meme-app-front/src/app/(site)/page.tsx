@@ -5,11 +5,6 @@ import { PublicationsContainer } from '@/components/publications/publications-co
 export default function Home() {
   const isAuthorized = true;
 
-  const posts = [
-    { id: 1, content: 'This is the first post!' },
-    { id: 2, content: 'Another post here.' },
-  ];
-
   return (
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-4">
@@ -19,13 +14,6 @@ export default function Home() {
       </div>
 
       <PublicationsContainer />
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <div key={post.id} className="p-4 border rounded-lg">
-            <p>{post.content}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

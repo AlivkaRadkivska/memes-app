@@ -1,7 +1,6 @@
 'use client';
 import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 
@@ -12,13 +11,23 @@ const TabsList = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => {
   const { theme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const themeClass = mounted
+    ? theme === 'dark'
+      ? 'bg-zinc-400 text-zinc-700'
+      : 'bg-zinc-700 text-zinc-300'
+    : 'bg-zinc-700 text-zinc-300';
+
   return (
     <TabsPrimitive.List
       ref={ref}
       className={cn(
-        `w-full inline-flex h-12 items-center justify-center rounded-md bg-muted py-1 px-2 text-muted-foreground ${
-          theme === 'dark' ? 'bg-white text-zinc-700' : 'bg-black text-zinc-300'
-        }`,
+        `w-full inline-flex h-12 items-center justify-center rounded-md bg-muted py-1 px-2 text-muted-foreground ${themeClass}`,
         className
       )}
       {...props}
