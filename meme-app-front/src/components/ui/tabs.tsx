@@ -19,15 +19,15 @@ const TabsList = React.forwardRef<
 
   const themeClass = mounted
     ? theme === 'dark'
-      ? 'bg-zinc-400 text-zinc-700'
-      : 'bg-zinc-700 text-zinc-300'
-    : 'bg-zinc-700 text-zinc-300';
+      ? 'bg-white text-black'
+      : 'bg-black text-white'
+    : 'bg-black text-white';
 
   return (
     <TabsPrimitive.List
       ref={ref}
       className={cn(
-        `w-full inline-flex h-12 items-center justify-center rounded-md bg-muted py-1 px-2 text-muted-foreground ${themeClass}`,
+        `w-full inline-flex items-center justify-center rounded-md bg-muted py-1 px-2 text-muted-foreground ${themeClass} gap-1`,
         className
       )}
       {...props}
@@ -43,7 +43,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      'w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+      'w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
       className
     )}
     {...props}

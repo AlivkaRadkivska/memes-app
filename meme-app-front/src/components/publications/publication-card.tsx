@@ -38,25 +38,32 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   } = publication;
 
   return (
-    <Card className="w-full max-w-md shadow-md overflow-hidden">
-      <Carousel className="w-full h-64 bg-gray-100">
+    <Card className="w-full shadow-md overflow-hidden flex min-h-72 h-[60vh]">
+      <Carousel className="w-full h-full">
         <CarouselContent>
           {pictures.map((picture) => (
-            <CarouselItem key={picture} className="relative w-full h-64">
+            <CarouselItem
+              key={picture}
+              className="relative w-full min-h-72 h-[60vh]"
+            >
               <Image
                 src={picture}
                 alt={picture}
                 layout="fill"
-                objectFit="cover"
+                objectFit="contain"
               />
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        {pictures.length > 1 && (
+          <>
+            <CarouselPrevious />
+            <CarouselNext />
+          </>
+        )}
       </Carousel>
 
-      <CardContent className="p-4">
+      <CardContent className="p-4 w-[40%] h-full">
         {isBanned ? (
           <p className="text-red-500 text-sm font-semibold">
             This post is banned. Reason: {banReason}
@@ -70,7 +77,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             <p className="mt-2 text-gray-700">{description}</p>
             <p className="mt-1 text-sm text-gray-500">#{keywords.join(' #')}</p>
 
-            <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center gap-4 mt-auto">
               <Button
                 variant="ghost"
                 onClick={() => onLike(id)}

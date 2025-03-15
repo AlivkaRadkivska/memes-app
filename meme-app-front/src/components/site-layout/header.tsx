@@ -7,8 +7,8 @@ export function Header() {
   const isAuthorized = true;
 
   return (
-    <header className="border-b">
-      <div className="grid grid-cols-3 max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+    <header className="border-b fixed top-0 w-full z-50 bg-background">
+      <div className="grid grid-cols-3 max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
         <div className="text-xl bold flex items-center justify-start">
           <p>Meme&apos;s basement</p>
         </div>
