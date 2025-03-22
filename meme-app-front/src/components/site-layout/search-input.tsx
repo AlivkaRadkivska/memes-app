@@ -45,7 +45,7 @@ export function SearchInput() {
         variant="outline"
         size="icon"
         onClick={() => setExpanded((prev) => !prev)}
-        className="block"
+        className="flex"
       >
         {!expanded ? (
           <Search className="w-4 h-5 z-50" />

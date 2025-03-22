@@ -21,6 +21,7 @@ export function ThemeToggle() {
       variant="outline"
       size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className="flex w-9 h-9 min-w-9"
     >
       {theme === 'dark' ? (
         <Moon className="w-4 h-5" />

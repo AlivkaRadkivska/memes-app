@@ -1,13 +1,14 @@
 'use client';
 
-import * as React from 'react';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { StepBack, StepForward } from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes';
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -197,8 +198,9 @@ CarouselItem.displayName = 'CarouselItem';
 const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
->(({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
+>(({ className, variant = 'ghost', size = 'icon', ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+  const { theme } = useTheme();
 
   return (
     <Button
@@ -206,17 +208,17 @@ const CarouselPrevious = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'absolute  h-8 w-8 rounded-full',
+        'absolute  h-10 w-10 rounded-md [&_svg]:size-6',
         orientation === 'horizontal'
-          ? 'left-2 top-1/2 -translate-y-1/2 opacity-60'
-          : 'top-2 left-1/2 -translate-x-1/2 rotate-90 opacity-60',
+          ? 'left-2 top-1/2 -translate-y-1/2 opacity-80'
+          : 'top-6 left-1/2 -translate-x-1/2 rotate-90 opacity-80',
         className
       )}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft className="h-4 w-4" color="white" />
+      <StepBack color={theme === 'dark' ? 'white' : 'black'} />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -226,8 +228,9 @@ CarouselPrevious.displayName = 'CarouselPrevious';
 const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
->(({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
+>(({ className, variant = 'ghost', size = 'icon', ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
+  const { theme } = useTheme();
 
   return (
     <Button
@@ -235,17 +238,17 @@ const CarouselNext = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        'absolute h-8 w-8 rounded-full',
+        'absolute h-10 w-10 rounded-md [&_svg]:size-6',
         orientation === 'horizontal'
-          ? 'right-2 top-1/2 -translate-y-1/2 opacity-60'
-          : 'bottom-2 left-1/2 -translate-x-1/2 rotate-90 opacity-60',
+          ? 'right-2 top-1/2 -translate-y-1/2 opacity-80'
+          : 'bottom-6 left-6 -translate-x-1/2 rotate-90 opacity-80',
         className
       )}
       disabled={!canScrollNext}
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight className="h-4 w-4" color="white" />
+      <StepForward color={theme === 'dark' ? 'white' : 'black'} />
       <span className="sr-only">Next slide</span>
     </Button>
   );
@@ -253,10 +256,10 @@ const CarouselNext = React.forwardRef<
 CarouselNext.displayName = 'CarouselNext';
 
 export {
-  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselPrevious,
   CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
 };

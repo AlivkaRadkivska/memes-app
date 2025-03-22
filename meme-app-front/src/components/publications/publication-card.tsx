@@ -1,8 +1,13 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Publication } from '@/server/types/publication';
-import { Heart, MessageSquare } from 'lucide-react';
+import { EllipsisVertical, Heart, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import {
   Carousel,
@@ -11,6 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '../ui/carousel';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface PublicationCardProps {
   publication: Publication;
@@ -29,7 +35,6 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     description,
     keywords,
     author,
-    createdAt,
     isLiked,
     likeCount,
     commentCount,
@@ -38,42 +43,61 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   } = publication;
 
   return (
-    <Card className="w-full shadow-md overflow-hidden flex min-h-72 h-[60vh]">
-      <Carousel className="w-full h-full">
-        <CarouselContent>
-          {pictures.map((picture) => (
-            <CarouselItem
-              key={picture}
-              className="relative w-full min-h-72 h-[60vh]"
-            >
-              <Image
-                src={picture}
-                alt={picture}
-                layout="fill"
-                objectFit="contain"
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        {pictures.length > 1 && (
-          <>
-            <CarouselPrevious />
-            <CarouselNext />
-          </>
-        )}
-      </Carousel>
+    <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-x-0 p-0">
+      <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
+        <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
+          <Avatar className="w-16 h-16">
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              alt={author.email}
+            />
+            <AvatarFallback>{author.username}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <p className="font-semibold text-lg ">{author.username}</p>
+            <p className="text-sm -mt-1">@{author.email}</p>
+          </div>
+        </div>
+        <div className="flex items-center">
+          <Button variant="ghost" className="w-6">
+            <EllipsisVertical />
+          </Button>
+        </div>
+      </CardHeader>
 
-      <CardContent className="p-4 w-[40%] h-full">
+      <CardContent className=" w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
+        <Carousel className="w-full h-full">
+          <CarouselContent className="w-full h-full">
+            {pictures.map((picture) => (
+              <CarouselItem
+                key={picture}
+                className="relative w-full min-h-72 h-[calc(60vh-120px)]"
+              >
+                <Image
+                  src={picture}
+                  alt={picture}
+                  layout="fill"
+                  objectFit="contain"
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          {pictures.length > 1 && (
+            <>
+              <CarouselPrevious />
+              <CarouselNext />
+            </>
+          )}
+        </Carousel>
+      </CardContent>
+
+      <CardFooter className="w-full justify-between h-5 p-1">
         {isBanned ? (
           <p className="text-red-500 text-sm font-semibold">
             This post is banned. Reason: {banReason}
           </p>
         ) : (
           <>
-            <p className="text-gray-800 font-semibold">@{author.username}</p>
-            <p className="text-gray-500 text-sm">
-              {new Date(createdAt).toLocaleDateString()}
-            </p>
             <p className="mt-2 text-gray-700">{description}</p>
             <p className="mt-1 text-sm text-gray-500">#{keywords.join(' #')}</p>
 
@@ -98,7 +122,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             </div>
           </>
         )}
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 };
