@@ -4,7 +4,6 @@ import { PublicationCard } from './publication-card';
 
 export function PublicationsContainer() {
   const { publications } = useGetPublications();
-  console.log(publications);
 
   return (
     <div className="flex flex-col width-full height-full">

@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -5,18 +6,20 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { Publication } from '@/server/types/publication';
-import { EllipsisVertical, Heart, MessageSquare } from 'lucide-react';
-import Image from 'next/image';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '../ui/carousel';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+} from '@/components/ui/carousel';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { Publication } from '@/server/types/publication';
+import Loader from '@public/images/loader.png';
+import { EllipsisVertical, Heart, MessageSquare, Triangle } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface PublicationCardProps {
   publication: Publication;
@@ -24,11 +27,22 @@ interface PublicationCardProps {
   onComment: (id: string) => void;
 }
 
+const formatCount = (count: number) =>
+  count >= 1_000_000_000
+    ? Math.round(count / 1_000_000_000) + 'B'
+    : count >= 1_000_000
+    ? Math.round(count / 1_000_000) + 'M'
+    : count >= 1_000
+    ? Math.round(count / 1_000) + 'K'
+    : count;
+
 export const PublicationCard: React.FC<PublicationCardProps> = ({
   publication,
   onLike,
   onComment,
 }) => {
+  const [isDescCollapsed, setIsDescCollapsed] = useState(true);
+
   const {
     id,
     pictures,
@@ -54,8 +68,10 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             <AvatarFallback>{author.username}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <p className="font-semibold text-lg ">{author.username}</p>
-            <p className="text-sm -mt-1">@{author.email}</p>
+            <p className="font-semibold text-lg">
+              {author.fullName || author.username}
+            </p>
+            <p className="text-sm -mt-1">@{author.username}</p>
           </div>
         </div>
         <div className="flex items-center">
@@ -65,7 +81,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className=" w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
+      <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
         <Carousel className="w-full h-full">
           <CarouselContent className="w-full h-full">
             {pictures.map((picture) => (
@@ -73,12 +89,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
                 key={picture}
                 className="relative w-full min-h-72 h-[calc(60vh-120px)]"
               >
-                <Image
-                  src={picture}
-                  alt={picture}
-                  layout="fill"
-                  objectFit="contain"
-                />
+                <ImageWithSkeleton src={picture} />
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -91,33 +102,60 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         </Carousel>
       </CardContent>
 
-      <CardFooter className="w-full justify-between h-5 p-1">
+      <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
         {isBanned ? (
           <p className="text-red-500 text-sm font-semibold">
             This post is banned. Reason: {banReason}
           </p>
         ) : (
           <>
-            <p className="mt-2 text-gray-700">{description}</p>
-            <p className="mt-1 text-sm text-gray-500">#{keywords.join(' #')}</p>
+            <div
+              className={cn(
+                'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[85%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
+                isDescCollapsed ? 'max-h-12' : 'max-h-[500%]'
+              )}
+              style={{
+                transition:
+                  'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
+              }}
+              onClick={() => setIsDescCollapsed((prev) => !prev)}
+            >
+              <Button variant="ghost" className="[&_svg]:size-4">
+                <Triangle
+                  className={cn(
+                    'transition-all duration-500 ease-in-out',
+                    isDescCollapsed ? 'rotate-0' : 'rotate-180'
+                  )}
+                />
+              </Button>
+              <div className="flex flex-col gap-5">
+                <p className="mt-2">{description}</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  #{keywords.join(' #')}
+                </p>
+              </div>
+              <div
+                className={cn(
+                  'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
+                  isDescCollapsed ? 'h-full ' : 'h-[150%]'
+                )}
+              ></div>
+            </div>
 
-            <div className="flex items-center gap-4 mt-auto">
+            <div className="flex items-center mt-auto z-10">
               <Button
                 variant="ghost"
                 onClick={() => onLike(id)}
-                className={cn(
-                  'flex items-center gap-1',
-                  isLiked && 'text-red-500'
-                )}
+                className={cn('flex items-center', isLiked && 'text-red-500')}
               >
-                <Heart size={18} /> {likeCount}
+                <Heart size={18} /> {formatCount(likeCount)}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => onComment(id)}
-                className="flex items-center gap-1"
+                className="flex items-center"
               >
-                <MessageSquare size={18} /> {commentCount}
+                <MessageSquare size={18} /> {formatCount(commentCount)}
               </Button>
             </div>
           </>
@@ -126,3 +164,33 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     </Card>
   );
 };
+
+function ImageWithSkeleton({ src }: { src: string }) {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <div className="relative w-full h-full flex items-center justify-center">
+      {loading && (
+        <Skeleton className="absolute top-0 right-0 inset-0 w-full h-full bg-background flex items-center justify-center z-10 animate-none">
+          <Image
+            src={Loader}
+            alt="image-loader"
+            width={100}
+            height={100}
+            className="animate-spin duration-1000 dark:invert"
+          />
+        </Skeleton>
+      )}
+
+      <Image
+        src={src}
+        alt="Carousel Image"
+        layout="fill"
+        objectFit="contain"
+        loading="lazy"
+        onLoad={() => setLoading(false)}
+        onError={() => setLoading(false)}
+      />
+    </div>
+  );
+}
