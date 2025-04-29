@@ -19,7 +19,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
-import { PaginatedResponseDto } from 'src/common-dto/paginated-data.dto';
+import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { UserEntity } from 'src/user/user.entity';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { PublicationFiltersDto } from './dto/publication-filters.dto';
@@ -37,7 +37,7 @@ export class PublicationController {
   getPublications(
     @GetUser() user?: UserEntity,
     @Query() filters?: PublicationFiltersDto,
-  ): Promise<PaginatedResponseDto<PublicationEntity>> {
+  ): Promise<PaginatedDataDto<PublicationEntity>> {
     return this.publicationService.getAll(user, filters);
   }
 

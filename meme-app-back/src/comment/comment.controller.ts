@@ -17,7 +17,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { PaginatedResponseDto } from 'src/common-dto/paginated-data.dto';
+import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { UserEntity } from 'src/user/user.entity';
 import { CommentEntity } from './comment.entity';
 import { CommentService } from './comment.service';
@@ -32,7 +32,7 @@ export class CommentController {
   @Get()
   getComments(
     @Query() filters?: CommentFiltersDto,
-  ): Promise<PaginatedResponseDto<CommentEntity>> {
+  ): Promise<PaginatedDataDto<CommentEntity>> {
     return this.commentService.getAll(filters);
   }
 
