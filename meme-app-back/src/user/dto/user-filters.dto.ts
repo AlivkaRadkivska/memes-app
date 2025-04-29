@@ -5,4 +5,7 @@ export class UserFiltersDto {
   birthday?: string;
   isBanned?: boolean;
   search?: string;
+
+  limit?: number;
+  page?: number;
 }

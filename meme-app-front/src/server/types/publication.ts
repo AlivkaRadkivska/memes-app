@@ -21,3 +21,15 @@ export interface Publication {
   commentCount: number;
   isLiked: boolean;
 }
+
+export interface PublicationFilters {
+  keywords?: string;
+  status?: string;
+  isBanned?: boolean;
+  search?: string;
+  author?: string;
+  createdAtDesc?: boolean;
+
+  limit?: number;
+  page?: number;
+}

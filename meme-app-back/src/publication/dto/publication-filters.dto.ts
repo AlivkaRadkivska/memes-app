@@ -5,4 +5,7 @@ export class PublicationFiltersDto {
   search?: string;
   author?: string;
   createdAtDesc?: boolean;
+
+  limit?: number;
+  page?: number;
 }
