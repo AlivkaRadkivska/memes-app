@@ -32,13 +32,13 @@ export function SearchInput() {
         <Label className="w-full min-w-72">
           <Input
             type="text"
-            placeholder="Provide meme description or author..."
+            placeholder="Напиши опис мему чи ім'я автора..."
             autoFocus
             className="w-full px-4 py-2 text-lg"
           />
         </Label>
         <Button type="submit" className="px-4 py-1">
-          Search
+          Пошук
         </Button>
       </div>
       <Button

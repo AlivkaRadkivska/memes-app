@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,6 +18,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Publication } from '@/server/types/publication';
 import Loader from '@public/images/loader.png';
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogTitle,
+} from '@radix-ui/react-dialog';
 import { EllipsisVertical, Heart, MessageSquare, Triangle } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -42,6 +49,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   onComment,
 }) => {
   const [isDescCollapsed, setIsDescCollapsed] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
     id,
@@ -57,119 +65,159 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   } = publication;
 
   return (
-    <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-x-0 p-0">
-      <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
-        <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
-          <Avatar className="w-16 h-16">
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              alt={author.email}
-            />
-            <AvatarFallback>{author.username}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <p className="font-semibold text-lg">
-              {author.fullName || author.username}
-            </p>
-            <p className="text-sm -mt-1">@{author.username}</p>
+    <>
+      <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-x-0 p-0">
+        <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
+          <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
+            <Avatar className="w-16 h-16">
+              <AvatarImage
+                src="https://github.com/shadcn.png"
+                alt={author.email}
+              />
+              <AvatarFallback>{author.username}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <p className="font-semibold text-lg">
+                {author.fullName || author.username}
+              </p>
+              <p className="text-sm -mt-1">@{author.username}</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center">
-          <Button variant="ghost" className="w-6">
-            <EllipsisVertical />
-          </Button>
-        </div>
-      </CardHeader>
+          <div className="flex items-center">
+            <Button variant="ghost" className="w-6">
+              <EllipsisVertical />
+            </Button>
+          </div>
+        </CardHeader>
 
-      <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
-        <Carousel className="w-full h-full">
-          <CarouselContent className="w-full h-full">
-            {pictures.map((picture) => (
-              <CarouselItem
-                key={picture}
-                className="relative w-full min-h-72 h-[calc(60vh-120px)]"
-              >
-                <ImageWithSkeleton src={picture} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {pictures.length > 1 && (
+        <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
+          <Carousel className="w-full h-full">
+            <CarouselContent className="w-full h-full">
+              {pictures.map((picture) => (
+                <CarouselItem
+                  key={picture}
+                  className="relative w-full min-h-72 h-[calc(60vh-120px)]"
+                >
+                  <ImageWithSkeleton
+                    src={picture}
+                    onClick={() =>
+                      setSelectedImage((prev) =>
+                        picture === prev ? null : picture
+                      )
+                    }
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {pictures.length > 1 && (
+              <>
+                <CarouselPrevious />
+                <CarouselNext />
+              </>
+            )}
+          </Carousel>
+        </CardContent>
+
+        <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
+          {isBanned ? (
+            <p className="text-red-500 text-sm font-semibold">
+              Цей пост заборонений для перегляду. Причина: {banReason}
+            </p>
+          ) : (
             <>
-              <CarouselPrevious />
-              <CarouselNext />
-            </>
-          )}
-        </Carousel>
-      </CardContent>
-
-      <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
-        {isBanned ? (
-          <p className="text-red-500 text-sm font-semibold">
-            This post is banned. Reason: {banReason}
-          </p>
-        ) : (
-          <>
-            <div
-              className={cn(
-                'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[85%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
-                isDescCollapsed ? 'max-h-12' : 'max-h-[500%]'
-              )}
-              style={{
-                transition:
-                  'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
-              }}
-              onClick={() => setIsDescCollapsed((prev) => !prev)}
-            >
-              <Button variant="ghost" className="[&_svg]:size-4">
-                <Triangle
-                  className={cn(
-                    'transition-all duration-500 ease-in-out',
-                    isDescCollapsed ? 'rotate-0' : 'rotate-180'
-                  )}
-                />
-              </Button>
-              <div className="flex flex-col gap-5">
-                <p className="mt-2">{description}</p>
-                <p className="mt-1 text-sm text-gray-500">
-                  #{keywords.join(' #')}
-                </p>
-              </div>
               <div
                 className={cn(
-                  'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
-                  isDescCollapsed ? 'h-full ' : 'h-[150%]'
+                  'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[85%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
+                  isDescCollapsed ? 'max-h-12' : 'max-h-[500%]'
                 )}
-              ></div>
-            </div>
+                style={{
+                  transition:
+                    'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
+                }}
+                onClick={() => setIsDescCollapsed((prev) => !prev)}
+              >
+                <Button variant="ghost" className="[&_svg]:size-4">
+                  <Triangle
+                    className={cn(
+                      'transition-all duration-500 ease-in-out',
+                      isDescCollapsed ? 'rotate-0' : 'rotate-180'
+                    )}
+                  />
+                </Button>
+                <div className="flex flex-col gap-5">
+                  <p className="mt-2">{description}</p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    #{keywords.join(' #')}
+                  </p>
+                </div>
+                <div
+                  className={cn(
+                    'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
+                    isDescCollapsed ? 'h-full ' : 'h-[150%]'
+                  )}
+                ></div>
+              </div>
 
-            <div className="flex items-center mt-auto z-10">
-              <Button
-                variant="ghost"
-                onClick={() => onLike(id)}
-                className={cn('flex items-center', isLiked && 'text-red-500')}
-              >
-                <Heart size={18} /> {formatCount(likeCount)}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => onComment(id)}
-                className="flex items-center"
-              >
-                <MessageSquare size={18} /> {formatCount(commentCount)}
-              </Button>
-            </div>
-          </>
-        )}
-      </CardFooter>
-    </Card>
+              <div className="flex items-center mt-auto z-10">
+                <Button
+                  variant="ghost"
+                  onClick={() => onLike(id)}
+                  className={cn('flex items-center', isLiked && 'text-red-500')}
+                >
+                  <Heart size={18} /> {formatCount(likeCount)}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => onComment(id)}
+                  className="flex items-center"
+                >
+                  <MessageSquare size={18} /> {formatCount(commentCount)}
+                </Button>
+              </div>
+            </>
+          )}
+        </CardFooter>
+      </Card>
+
+      <Dialog
+        open={!!selectedImage}
+        onOpenChange={() => setSelectedImage(null)}
+      >
+        <DialogOverlay className="fixed inset-0 bg-black/70 z-40" />
+        <DialogContent className="fixed inset-0 z-50 flex items-center justify-center p-0 bg-transparent border-none shadow-none">
+          <VisuallyHidden>
+            <DialogTitle>Full Image Preview</DialogTitle>
+          </VisuallyHidden>
+          {selectedImage && (
+            <Image
+              src={selectedImage}
+              alt="Full Image"
+              width={1200}
+              height={800}
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded cursor-pointer"
+              onClick={() => setSelectedImage(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
-function ImageWithSkeleton({ src }: { src: string }) {
+function ImageWithSkeleton({
+  src,
+  onClick,
+}: {
+  src: string;
+  onClick: () => void;
+}) {
   const [loading, setLoading] = useState(true);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div
+      className="relative w-full h-full flex items-center justify-center"
+      onClick={onClick}
+    >
       {loading && (
         <Skeleton className="absolute top-0 right-0 inset-0 w-full h-full bg-background flex items-center justify-center z-10 animate-none">
           <Image
@@ -190,6 +238,7 @@ function ImageWithSkeleton({ src }: { src: string }) {
         loading="lazy"
         onLoad={() => setLoading(false)}
         onError={() => setLoading(false)}
+        style={{ cursor: 'pointer' }}
       />
     </div>
   );

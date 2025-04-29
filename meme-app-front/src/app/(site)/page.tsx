@@ -9,7 +9,7 @@ export default function Home() {
     <div className="px-4 py-0 sm:px-0">
       <div className="mb-4">
         <Button disabled={!isAuthorized} className="w-full sm:w-auto">
-          Create New Post
+          Створити новий пост
         </Button>
       </div>
 

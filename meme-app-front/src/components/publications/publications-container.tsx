@@ -1,20 +1,38 @@
 'use client';
 import useGetPublications from '@/server/hooks/publications/use-get-publications';
+import { useInView } from 'react-intersection-observer';
 import { PublicationCard } from './publication-card';
+import { useEffect } from 'react';
 
 export function PublicationsContainer() {
-  const { publications } = useGetPublications();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetPublications();
+
+  const { ref, inView } = useInView({ threshold: 1 });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="flex flex-col width-full height-full">
-      {publications?.map((publication) => (
-        <PublicationCard
-          key={publication.id}
-          publication={publication}
-          onLike={() => {}}
-          onComment={() => {}}
-        />
-      ))}
+    <div>
+      {data?.pages.flatMap((page) =>
+        page.items.map((publication) => (
+          <PublicationCard
+            key={publication.id}
+            publication={publication}
+            onLike={() => {}}
+            onComment={() => {}}
+          />
+        ))
+      )}
+
+      {isFetchingNextPage && (
+        <p className="text-center text-sm">Завантаження...</p>
+      )}
+      <div ref={ref} className="h-10" />
     </div>
   );
 }

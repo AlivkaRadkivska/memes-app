@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Memes app',
-  description: 'Platform for creating and publishing memes',
+  title: 'Memes basement',
+  description: 'Платформа для створення та публікації мемів',
 };
 
 export default function RootLayout({

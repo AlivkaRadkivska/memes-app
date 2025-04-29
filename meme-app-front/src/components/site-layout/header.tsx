@@ -7,7 +7,7 @@ export function Header() {
   const isAuthorized = true;
 
   return (
-    <header className="border-b fixed top-0 w-full z-50 bg-background">
+    <header className="border-b fixed top-0 w-full z-40 bg-background">
       <div className="grid grid-cols-3 max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
         <div className="text-xl bold flex items-center justify-start">
           <p>Meme&apos;s basement</p>
@@ -15,9 +15,9 @@ export function Header() {
 
         <Tabs defaultValue="main">
           <TabsList>
-            <TabsTrigger value="main">Recommendations</TabsTrigger>
+            <TabsTrigger value="main">Рекомендації</TabsTrigger>
             <TabsTrigger value="followings" disabled={!isAuthorized}>
-              Followings
+              Підписки
             </TabsTrigger>
           </TabsList>
         </Tabs>
