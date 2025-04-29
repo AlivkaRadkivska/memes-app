@@ -9,17 +9,20 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CommentService } from './comment.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { UserEntity } from 'src/user/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { PaginatedResponseDto } from 'src/common-dto/paginated-data.dto';
+import { UserEntity } from 'src/user/user.entity';
 import { CommentEntity } from './comment.entity';
+import { CommentService } from './comment.service';
+import { CommentFiltersDto } from './dto/comment-filters.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -27,8 +30,10 @@ export class CommentController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getComments(): Promise<CommentEntity[]> {
-    return this.commentService.getAll();
+  getComments(
+    @Query() filters?: CommentFiltersDto,
+  ): Promise<PaginatedResponseDto<CommentEntity>> {
+    return this.commentService.getAll(filters);
   }
 
   @HttpCode(HttpStatus.OK)

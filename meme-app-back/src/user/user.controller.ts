@@ -7,9 +7,10 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserEntity } from './user.entity';
+import { PaginatedResponseDto } from 'src/common-dto/paginated-data.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
+import { UserEntity } from './user.entity';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -17,7 +18,9 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  getAll(@Query() filters?: UserFiltersDto): Promise<UserEntity[]> {
+  getAll(
+    @Query() filters?: UserFiltersDto,
+  ): Promise<PaginatedResponseDto<UserEntity>> {
     return this.userService.getAll(filters);
   }
 
