@@ -3,12 +3,33 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLogin } from '@/server/hooks/auth/use-login';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function LoginForm() {
+  const { mutate: login, isPending, error } = useLogin();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { mutate: login, isPending, error } = useLogin();
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const user = searchParams.get('user');
+    const error = searchParams.get('error');
+
+    if (error) {
+      router.replace('/not-found');
+      return;
+    }
+
+    if (token && user) {
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', user);
+      router.replace('/');
+    }
+  }, [router, searchParams]);
 
   return (
     <>

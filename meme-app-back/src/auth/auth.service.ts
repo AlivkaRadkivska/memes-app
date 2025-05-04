@@ -4,14 +4,16 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from './../user/user.service';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { AuthResultDto } from './dto/auth-result.dto';
 import * as bcrypt from 'bcrypt';
+import { Profile } from 'passport';
+import { getClientUrl } from 'src/constants/client-url.constant';
+import { UserEntity } from 'src/user/user.entity';
+import { UserService } from './../user/user.service';
+import { AuthResultDto } from './dto/auth-result.dto';
 import { SignInCredentialsDto } from './dto/sign-in-credentials.dto';
 import { SignUpCredentialsDto } from './dto/sign-up-credentials.dto';
-import { Profile } from 'passport';
-import { UserEntity } from 'src/user/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -98,6 +100,29 @@ export class AuthService {
       },
       accessToken: await this.generateToken(user.id, user.email),
     };
+  }
+
+  async handleGoogleRedirect(data: AuthResultDto): Promise<string> {
+    const clientUrl = getClientUrl(new ConfigService());
+
+    const { accessToken, user } = data;
+    const redirectUrl = new URL(`${clientUrl}/login`);
+
+    try {
+      if (!accessToken) {
+        redirectUrl.searchParams.append('error', '401');
+      } else {
+        redirectUrl.searchParams.append('token', accessToken);
+        redirectUrl.searchParams.append('user', JSON.stringify(user));
+      }
+
+      return redirectUrl.toString();
+    } catch (err) {
+      console.error(err);
+
+      redirectUrl.searchParams.append('error', '500');
+      return redirectUrl.toString();
+    }
   }
 
   async generateToken(id: string, email: string): Promise<string> {

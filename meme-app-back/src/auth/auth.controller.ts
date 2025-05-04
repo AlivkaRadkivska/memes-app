@@ -6,16 +6,16 @@ import {
   HttpStatus,
   Post,
   Req,
-  Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { AuthService } from './auth.service';
 import { UserEntity } from 'src/user/user.entity';
+import { AuthService } from './auth.service';
+import { AuthResultDto } from './dto/auth-result.dto';
 import { SignInCredentialsDto } from './dto/sign-in-credentials.dto';
 import { SignUpCredentialsDto } from './dto/sign-up-credentials.dto';
 import { GoogleAuthGuard } from './guards/google-oauth.guard';
-import { AuthResultDto } from './dto/auth-result.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -44,13 +44,13 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(GoogleAuthGuard)
-  getGoogleRedirect(@Req() req): AuthResultDto {
-    return req.user;
+  async googleRedirect(@Req() req, @Res() res) {
+    return res.redirect(await this.authService.handleGoogleRedirect(req.user));
   }
-
+  @HttpCode(HttpStatus.OK)
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req): UserEntity {
+  getProfile(@Req() req): UserEntity {
     return req.user;
   }
 }
