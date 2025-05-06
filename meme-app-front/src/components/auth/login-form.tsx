@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useLogin } from '@/server/hooks/auth/use-login';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Label } from '../ui/label';
 
 export default function LoginForm() {
   const { mutate: login, isPending, error } = useLogin();
@@ -32,28 +33,34 @@ export default function LoginForm() {
   }, [router, searchParams]);
 
   return (
-    <>
+    <div className="flex flex-col gap-4 w-full max-w-lg">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           login({ email, password });
         }}
-        className="flex flex-col gap-4 max-w-sm"
+        className="flex flex-col w-full gap-4"
       >
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <Label>
+          Пошта
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Label>
+        <Label>
+          Пароль
+          <Input
+            type="password"
+            placeholder="12345678"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Label>
         <Button type="submit" disabled={isPending}>
-          {isPending ? 'Logging in...' : 'Login'}
+          {isPending ? 'Завантаження...' : 'Логін'}
         </Button>
         {error && <p className="text-red-500">Вхід в акаунт провалено</p>}
       </form>
@@ -63,6 +70,6 @@ export default function LoginForm() {
           Увійти з Google
         </Button>
       </a>
-    </>
+    </div>
   );
 }

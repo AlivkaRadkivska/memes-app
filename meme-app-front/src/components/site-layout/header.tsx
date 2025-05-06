@@ -1,26 +1,54 @@
 'use client';
+import { usePathname, useRouter } from 'next/navigation';
+import { Button } from '../ui/button';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { SearchInput } from './search-input';
 import { ThemeToggle } from './theme-toggle';
 
 export function Header() {
   const isAuthorized = true;
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const renderCenterContent = () => {
+    if (pathname === '/') {
+      return (
+        <Tabs defaultValue="main">
+          <TabsList>
+            <TabsTrigger value="main">Шось новеньке</TabsTrigger>
+            <TabsTrigger value="followings" disabled={!isAuthorized}>
+              Меми друзів
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      );
+    }
+
+    if (pathname === '/login') {
+      return <p className="text-center h-full text-xl">Авторизація</p>;
+    }
+
+    if (pathname.startsWith('/profile')) {
+      return <p className="text-center">Профіль</p>;
+    }
+
+    return null;
+  };
 
   return (
     <header className="border-b fixed top-0 w-full z-40 bg-background">
       <div className="grid grid-cols-3 max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
-        <div className="text-xl bold flex items-center justify-start">
-          <p>Meme&apos;s basement</p>
+        <div className="w-full">
+          <Button
+            variant="ghost"
+            className="w-min text-xl bold flex items-center justify-start"
+            onClick={() => router.push('/')}
+          >
+            <p>Meme&apos;s basement</p>
+          </Button>
         </div>
 
-        <Tabs defaultValue="main">
-          <TabsList>
-            <TabsTrigger value="main">Рекомендації</TabsTrigger>
-            <TabsTrigger value="followings" disabled={!isAuthorized}>
-              Підписки
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div>{renderCenterContent()}</div>
 
         <div className="relative flex max-w-sm items-center space-x-2 ml-auto justify-end">
           <SearchInput />
