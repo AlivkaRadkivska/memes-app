@@ -8,6 +8,7 @@ import { SidebarToggle } from '../ui/sidebar-toggle';
 import { Button } from '../ui/button';
 import { LogOut, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/auth-context';
 
 interface UserSidebarProps {
   className?: string;
@@ -15,8 +16,7 @@ interface UserSidebarProps {
 
 export function UserSidebar({ className }: UserSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const signout = () => {};
-  const isAuthenticated = false;
+  const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
 
   return (
@@ -62,7 +62,7 @@ export function UserSidebar({ className }: UserSidebarProps) {
                 'w-full',
                 isCollapsed ? 'justify-center' : 'justify-start'
               )}
-              onClick={signout}
+              onClick={logout}
             >
               <LogOut className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
               {!isCollapsed && 'Вийти з аку'}

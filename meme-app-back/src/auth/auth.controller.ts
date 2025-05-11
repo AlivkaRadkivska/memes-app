@@ -50,7 +50,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Req() req): UserEntity {
-    return req.user;
+  getProfile(@Req() req): Promise<UserEntity> {
+    return this.authService.getProfile(req.user);
   }
 }

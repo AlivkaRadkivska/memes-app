@@ -22,6 +22,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async getProfile(user: Partial<UserEntity>): Promise<UserEntity> {
+    return this.userService.getOne(user.id);
+  }
+
   async signIn(
     signInCredentialsDto: SignInCredentialsDto,
   ): Promise<AuthResultDto> {

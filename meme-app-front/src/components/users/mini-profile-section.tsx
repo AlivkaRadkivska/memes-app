@@ -2,18 +2,12 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 
 export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
-  const isAuthenticated = false;
-  const user = {
-    avatarUrl: 'https://github.com/shadcn.png',
-    email: 'guest@mail.com',
-    username: 'Guest',
-    followers: 0,
-    followings: 0,
-  };
+  const { user, isAuthenticated } = useAuth();
 
   const getInitials = (name: string) => {
     return name
@@ -29,28 +23,35 @@ export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
           isCollapsed ? 'h-10 w-10' : 'h-20 w-20'
         } transition-all duration-300 ease-in-out`}
       >
-        <AvatarImage src={user.avatarUrl} alt={user.username} />
+        <AvatarImage
+          src={'https://github.com/shadcn.png'}
+          alt={user?.username || 'guest'}
+        />
         <AvatarFallback className="bg-primary/10 text-primary">
-          {getInitials(user.username)}
+          {getInitials(user?.username || 'Гість')}
         </AvatarFallback>
       </Avatar>
 
       {!isCollapsed && (
         <div className="flex flex-col items-center space-y-1 text-center">
-          <h3 className="font-medium leading-none">{user.username}</h3>
-          <p className="text-sm text-muted-foreground">{user.email}</p>
+          <h3 className="font-medium leading-none">
+            {user?.username || 'Гість'}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {user?.email || 'guest@mail'}
+          </p>
 
           {isAuthenticated && (
-            <div className="flex gap-4 mt-2">
+            <div className="flex gap-4 pt-4">
               <div className="text-center">
                 <p className="text-sm font-medium leading-none">
-                  {user.followers}
+                  {user?.followerCount || 0}
                 </p>
                 <p className="text-xs text-muted-foreground">Followers</p>
               </div>
               <div className="text-center">
                 <p className="text-sm font-medium leading-none">
-                  {user.followings}
+                  {user?.followingCount || 0}
                 </p>
                 <p className="text-xs text-muted-foreground">Following</p>
               </div>
@@ -58,20 +59,20 @@ export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
           )}
         </div>
       )}
-      {/* {isAuthenticated && ( */}
-      <Button
-        variant="default"
-        size={isCollapsed ? 'icon' : 'default'}
-        className={cn(
-          'w-full',
-          isCollapsed ? 'justify-center' : 'justify-start mt-5'
-        )}
-        onClick={() => {}}
-      >
-        <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
-        {!isCollapsed && 'Підкинути мемчиків'}
-      </Button>
-      {/* )} */}
+      {isAuthenticated && (
+        <Button
+          variant="default"
+          size={isCollapsed ? 'icon' : 'default'}
+          className={cn(
+            'w-full',
+            isCollapsed ? 'justify-center' : 'justify-start mt-5'
+          )}
+          onClick={() => {}}
+        >
+          <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
+          {!isCollapsed && 'Підкинути мемчиків'}
+        </Button>
+      )}
     </div>
   );
 }
