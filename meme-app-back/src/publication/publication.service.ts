@@ -24,6 +24,7 @@ export class PublicationService {
     const query = this.publicationRepository
       .createQueryBuilder('publication')
       .leftJoinAndSelect('publication.likes', 'likes')
+      .leftJoinAndSelect('likes.user', 'likeUser')
       .leftJoinAndSelect('publication.comments', 'comments')
       .leftJoinAndSelect('publication.author', 'author');
 

@@ -87,12 +87,12 @@ export class PublicationEntity {
     this.likeCount = this.likes ? this.likes.length : 0;
   }
 
-  setIsLiked(user?: UserEntity): void {
+  setIsLiked(user?: Partial<UserEntity>): void {
     if (!user) {
       this.isLiked = false;
       return;
     }
 
-    this.isLiked = this.likes.some((like) => like.user.id === user.id);
+    this.isLiked = this.likes.some((like) => like.user?.id === user.id);
   }
 }

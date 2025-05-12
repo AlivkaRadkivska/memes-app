@@ -1,8 +1,9 @@
+import { AuthProvider } from '@/contexts/auth-context';
+import { ReactQueryProvider } from '@/providers/query-client';
+import { ThemeProvider } from '@/providers/theme-provider';
 import '@public/styles/globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { ThemeProvider } from '@/providers/theme-provider';
-import { ReactQueryProvider } from '@/providers/query-client';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,7 +36,9 @@ export default function RootLayout({
             defaultTheme="light"
             disableTransitionOnChange
           >
-            <ReactQueryProvider>{children}</ReactQueryProvider>
+            <AuthProvider>
+              <ReactQueryProvider>{children}</ReactQueryProvider>
+            </AuthProvider>
           </ThemeProvider>
         </ReactQueryProvider>
       </body>

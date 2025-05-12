@@ -19,8 +19,8 @@ const TabsList = React.forwardRef<
 
   const themeClass = mounted
     ? theme === 'dark'
-      ? 'bg-white text-black'
-      : 'bg-black text-white'
+      ? 'bg-slate-400 text-black'
+      : 'bg-slate-700 text-white'
     : 'bg-black text-white';
 
   return (
