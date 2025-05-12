@@ -76,7 +76,7 @@ export class UserService {
       relations: ['followers', 'followings'],
       where: [{ id }, { email }],
     });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('Користувача не знайдено');
 
     return user;
   }
@@ -89,7 +89,7 @@ export class UserService {
       return user;
     } catch (error) {
       if (error.code == 23505)
-        throw new ConflictException(['Email is already taken']);
+        throw new ConflictException(['Email вже зайнятий']);
       else {
         console.error(error);
         throw new InternalServerErrorException();

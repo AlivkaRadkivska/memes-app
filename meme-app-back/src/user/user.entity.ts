@@ -11,6 +11,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserRole } from './dto/user-role.dto';
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -31,7 +32,7 @@ export class UserEntity {
   fullName?: string;
 
   @Column()
-  role: string;
+  role: UserRole;
 
   @Column({ nullable: true })
   birthday?: Date;

@@ -7,27 +7,26 @@ import { useState } from 'react';
 
 export const useSignup = () => {
   const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[] | null>(null);
   const { setAuthFromRedirect } = useAuth();
 
   const mutate = async (credentials: SignupCredentials) => {
     setIsPending(true);
-    setError(null);
+    setErrors(null);
 
     try {
       const result = await signupWithCredentials(credentials);
-
       setAuthFromRedirect(result.accessToken, JSON.stringify(result.user));
-
       return result;
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       console.error('Signup error:', err);
-      setError('Failed to signup. Please check your credentials.');
+      setErrors(err.response.data.message);
       throw err;
     } finally {
       setIsPending(false);
     }
   };
 
-  return { mutate, isPending, error };
+  return { mutate, isPending, errors };
 };

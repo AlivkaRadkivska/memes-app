@@ -32,8 +32,8 @@ export function UserSidebar({ className }: UserSidebarProps) {
         toggleSidebar={() => setIsCollapsed((prev) => !prev)}
       />
 
-      <div className="flex flex-col h-full">
-        <div className="pt-10">
+      <div className="flex flex-col h-full cursor-pointer">
+        <div className="pt-10" onClick={() => router.push('/profile')}>
           <MiniProfileSection isCollapsed={isCollapsed} />
         </div>
 
@@ -49,7 +49,7 @@ export function UserSidebar({ className }: UserSidebarProps) {
                 'w-full',
                 isCollapsed ? 'justify-center' : 'justify-start'
               )}
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/auth')}
             >
               <User className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
               {!isCollapsed && 'Авторизуватись'}

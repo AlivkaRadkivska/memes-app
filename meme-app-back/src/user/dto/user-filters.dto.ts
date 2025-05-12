@@ -1,7 +1,9 @@
+import { UserRole } from './user-role.dto';
+
 export class UserFiltersDto {
   email?: string;
   name?: string;
-  role?: 'user' | 'moderator';
+  role?: UserRole;
   birthday?: string;
   isBanned?: boolean;
   search?: string;

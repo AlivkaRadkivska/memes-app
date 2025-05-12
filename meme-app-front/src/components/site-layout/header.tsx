@@ -4,9 +4,10 @@ import { Button } from '../ui/button';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { SearchInput } from './search-input';
 import { ThemeToggle } from './theme-toggle';
+import { useAuth } from '@/contexts/auth-context';
 
 export function Header() {
-  const isAuthorized = true;
+  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -16,7 +17,7 @@ export function Header() {
         <Tabs defaultValue="main">
           <TabsList>
             <TabsTrigger value="main">Шось новеньке</TabsTrigger>
-            <TabsTrigger value="followings" disabled={!isAuthorized}>
+            <TabsTrigger value="followings" disabled={!isAuthenticated}>
               Меми друзів
             </TabsTrigger>
           </TabsList>
@@ -24,7 +25,7 @@ export function Header() {
       );
     }
 
-    if (pathname === '/login') {
+    if (pathname === '/auth') {
       return <p className="text-center h-full text-xl">Авторизація</p>;
     }
 

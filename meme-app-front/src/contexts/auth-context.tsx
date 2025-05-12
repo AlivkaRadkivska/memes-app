@@ -8,6 +8,7 @@ import { AuthContextType, LoginCredentials } from '@/server/types/auth';
 import { User } from '@/server/types/user';
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
+import Cookies from 'universal-cookie';
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -18,6 +19,8 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   setAuthFromRedirect: () => {},
 });
+
+const cookies = new Cookies();
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -55,6 +58,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(result.accessToken);
 
       localStorage.setItem('auth_token', result.accessToken);
+      cookies.set('auth_token', result.accessToken, {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      });
 
       router.push('/');
     } catch (error) {
@@ -70,12 +78,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      cookies.remove('auth_token', { path: '/' });
       setToken(null);
       setUser(null);
     }
 
     setIsLoading(false);
-    router.push('/login');
+    router.push('/auth');
   };
 
   const setAuthFromRedirect = (tokenStr: string) => {
@@ -83,6 +92,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(tokenStr);
 
       localStorage.setItem('auth_token', tokenStr);
+      cookies.set('auth_token', tokenStr, {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      });
     } catch (error) {
       console.error('Error setting auth from redirect:', error);
     }
