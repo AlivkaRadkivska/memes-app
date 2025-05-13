@@ -33,7 +33,7 @@ export function UserSidebar({ className }: UserSidebarProps) {
       />
 
       <div className="flex flex-col h-full cursor-pointer">
-        <div className="pt-10" onClick={() => router.push('/profile')}>
+        <div className="pt-10">
           <MiniProfileSection isCollapsed={isCollapsed} />
         </div>
 
