@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { uk } from 'date-fns/locale';
 
 interface DatePickerProps {
   date: Date | undefined;
@@ -38,7 +39,11 @@ export function DatePicker({
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, 'PPP') : <span>Оберіть дату</span>}
+          {date ? (
+            format(date, 'PPP', { locale: uk })
+          ) : (
+            <span>Оберіть дату</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -46,11 +51,9 @@ export function DatePicker({
           mode="single"
           selected={date}
           onSelect={setDate}
-          initialFocus
           required={required}
-          captionLayout="dropdown-buttons"
-          fromYear={1950}
-          toYear={new Date().getFullYear()}
+          endMonth={new Date()}
+          startMonth={new Date(1900, 1)}
         />
       </PopoverContent>
     </Popover>
