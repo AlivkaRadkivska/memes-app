@@ -5,6 +5,8 @@ export interface Photo {
   file: File;
   preview: string;
   name: string;
+  width: number;
+  height: number;
   edited?: boolean;
 }
 
@@ -16,12 +18,28 @@ interface PhotoState {
   getPhoto: (id: string) => Photo | undefined;
 }
 
+const getPhotoMeta = async (
+  url: string
+): Promise<{ naturalHeight: number; naturalWidth: number }> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = (err) => reject(err);
+    img.src = url;
+  });
+
 export const usePhotoStore = create<PhotoState>((set, get) => ({
   photos: [],
   addPhotos: (newPhotos) =>
-    set((state) => ({
-      photos: [...state.photos, ...newPhotos],
-    })),
+    set((state) => {
+      newPhotos.forEach(async (photo) => {
+        const res = await getPhotoMeta(photo.preview);
+        photo.height = res.naturalHeight;
+        photo.width = res.naturalWidth;
+      });
+
+      return { photos: [...state.photos, ...newPhotos] };
+    }),
   updatePhoto: (id, preview) =>
     set((state) => ({
       photos: state.photos.map((photo) =>

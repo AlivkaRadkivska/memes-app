@@ -21,6 +21,8 @@ export default function UploadPhotos() {
           file,
           preview: URL.createObjectURL(file),
           name: file.name,
+          width: 0,
+          height: 0,
         };
       });
 

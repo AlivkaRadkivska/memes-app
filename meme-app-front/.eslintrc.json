@@ -14,7 +14,7 @@
     "@typescript-eslint/prefer-as-const": "off",
     "no-extra-semi": "off",
     "@typescript-eslint/no-extra-semi": "off",
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "no-console": ["error", { "allow": ["error"] }]
   },
   "parser": "@typescript-eslint/parser",
   "root": true
