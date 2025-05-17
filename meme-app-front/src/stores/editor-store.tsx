@@ -19,7 +19,13 @@ export interface EditorObject {
   width?: number;
   height?: number;
   draggable?: boolean;
-  [key: string]: number | string | boolean | undefined;
+  crop?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  [key: string]: number | string | boolean | undefined | object;
 }
 
 export interface CropConfig {
@@ -62,6 +68,7 @@ export interface EditorState {
   setCropConfig: (config: CropConfig | null) => void;
 
   // History management
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   history: any;
   currentHistoryIndex: number;
   addHistory: () => void;
@@ -175,17 +182,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   // Canvas settings
-  canvasWidth: 800,
-  canvasHeight: 600,
+  canvasWidth: 0,
+  canvasHeight: 0,
   setCanvasSize: (width, height) =>
     set({
-      canvasWidth: width ? width : 800,
-      canvasHeight: height ? height : 600,
+      canvasWidth: width ? width : 0,
+      canvasHeight: height ? height : 0,
     }),
 
   // Clear all objects
   clearObjects: () => {
-    set({ objects: [] });
+    set({ objects: [], canvasHeight: 0, canvasWidth: 0 });
     get().addHistory();
   },
 }));

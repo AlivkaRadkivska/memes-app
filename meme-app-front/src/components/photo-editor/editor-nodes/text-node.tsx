@@ -6,7 +6,7 @@ import { Text, Transformer } from 'react-konva';
 interface TextNodeProps {
   object: EditorObject;
   isSelected: boolean;
-  onChange: (attrs: any) => void;
+  onChange: (attrs: EditorObject) => void;
   onSelect?: () => void;
 }
 

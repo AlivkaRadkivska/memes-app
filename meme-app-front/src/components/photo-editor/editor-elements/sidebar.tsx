@@ -57,7 +57,7 @@ export function Sidebar() {
 
       <div className="overflow-y-auto">{renderPanel()}</div>
 
-      {selectedObjectId && (
+      {selectedObjectId && selectedObjectId != 'main-image' && (
         <div className="border-t p-4 mt-auto">
           <Button
             variant="destructive"

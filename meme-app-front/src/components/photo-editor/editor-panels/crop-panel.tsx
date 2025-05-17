@@ -3,24 +3,18 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useEditorStore } from '@/stores/editor-store';
-import { Check, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export function CropPanel() {
-  const {
-    isCropping,
-    setIsCropping,
-    cropConfig,
-    setCropConfig,
-    setMode,
-    addHistory,
-  } = useEditorStore();
+  const { isCropping, setIsCropping, cropConfig, setCropConfig, setMode } =
+    useEditorStore();
 
-  const handleApplyCrop = () => {
-    setIsCropping(false);
-    setCropConfig(null);
-    setMode('select');
-    addHistory();
-  };
+  // const handleApplyCrop = () => {
+  //   setIsCropping(false);
+  //   setCropConfig(null);
+  //   setMode('select');
+  //   addHistory();
+  // };
 
   const handleCancelCrop = () => {
     setIsCropping(false);
@@ -65,10 +59,6 @@ export function CropPanel() {
           )}
 
           <div className="flex gap-2">
-            <Button onClick={handleApplyCrop} className="flex-1 gap-1">
-              <Check size={16} />
-              Apply
-            </Button>
             <Button
               variant="outline"
               onClick={handleCancelCrop}

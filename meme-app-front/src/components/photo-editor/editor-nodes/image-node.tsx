@@ -1,15 +1,14 @@
 import { EditorObject } from '@/stores/editor-store';
 import Konva from 'konva';
-import { RefObject, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Image, Transformer } from 'react-konva';
 import useImage from 'use-image';
 
 interface ImageNodeProps {
   object: EditorObject;
   isSelected: boolean;
-  onChange: (attrs: any) => void;
+  onChange: (attrs: EditorObject) => void;
   onSelect?: () => void;
-  ref?: RefObject<Konva.Image | null>;
 }
 
 export const ImageNode = ({
@@ -17,7 +16,6 @@ export const ImageNode = ({
   isSelected,
   onChange,
   onSelect,
-  ref,
 }: ImageNodeProps) => {
   const { x, y, width, height, src } = object;
   const shapeRef = useRef<Konva.Image>(null);
@@ -35,7 +33,7 @@ export const ImageNode = ({
     <>
       <Image
         alt={image}
-        ref={ref || shapeRef}
+        ref={shapeRef}
         image={image}
         x={x}
         y={y}

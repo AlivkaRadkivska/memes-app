@@ -16,13 +16,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/alert-dialog';
+import { useEditorStore } from '@/stores/editor-store';
 
 export function PhotoGallery() {
   const router = useRouter();
   const { photos, removePhoto } = usePhotoStore();
   const [deletePhotoId, setDeletePhotoId] = useState<string | null>(null);
+  const { addObject } = useEditorStore();
 
   const handleEditClick = (id: string) => {
+    addObject({
+      id: 'main-image',
+      type: 'image',
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      src: '',
+      draggable: true,
+    });
+
     router.push(`/editor/${id}`);
   };
 

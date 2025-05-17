@@ -52,10 +52,13 @@ const tools = [
 ];
 
 export function Toolbar() {
-  const { mode, setMode } = useEditorStore();
+  const { mode, setMode, setSelectedObjectId } = useEditorStore();
 
   return (
-    <div className="w-14 border-r bg-card flex flex-col items-center py-4 gap-2">
+    <div
+      className="w-14 border-r bg-card flex flex-col items-center py-4 gap-2"
+      onClick={() => setSelectedObjectId(null)}
+    >
       <TooltipProvider delayDuration={300}>
         {tools.map((tool, index) => (
           <div key={tool.id}>

@@ -9,7 +9,8 @@ interface ActionsBarProps {
 }
 
 export function ActionsBar({ photoId }: ActionsBarProps) {
-  const { undo, redo, history, currentHistoryIndex } = useEditorStore();
+  const { undo, redo, history, currentHistoryIndex, clearObjects } =
+    useEditorStore();
   const router = useRouter();
 
   const canUndo = currentHistoryIndex > 0;
@@ -17,7 +18,13 @@ export function ActionsBar({ photoId }: ActionsBarProps) {
 
   return (
     <div className="h-14 flex items-center gap-2 px-4 border-b">
-      <Button variant="outline" onClick={() => router.push('/editor')}>
+      <Button
+        variant="outline"
+        onClick={() => {
+          clearObjects();
+          router.push('/editor');
+        }}
+      >
         <CircleX size={16} />
         Нє, вернутись
       </Button>
@@ -41,7 +48,13 @@ export function ActionsBar({ photoId }: ActionsBarProps) {
       </Button>
       <div className="flex gap-2 ml-auto">
         <ExportButton photoId={photoId} />
-        <Button onClick={() => router.push('/editor')} size="sm">
+        <Button
+          size="sm"
+          onClick={() => {
+            clearObjects();
+            router.push('/editor');
+          }}
+        >
           Далі
         </Button>
       </div>
