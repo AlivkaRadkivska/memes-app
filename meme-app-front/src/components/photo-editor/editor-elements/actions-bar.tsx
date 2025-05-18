@@ -2,7 +2,7 @@ import { useEditorStore } from '@/stores/editor-store';
 import { CircleX, Redo2, Undo2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '../../ui/button';
-import { ExportButton } from './export-button';
+import { ExportButton } from './save-buttons';
 
 interface ActionsBarProps {
   photoId: string;
@@ -46,17 +46,9 @@ export function ActionsBar({ photoId }: ActionsBarProps) {
       >
         <Redo2 size={16} />
       </Button>
+
       <div className="flex gap-2 ml-auto">
         <ExportButton photoId={photoId} />
-        <Button
-          size="sm"
-          onClick={() => {
-            clearObjects();
-            router.push('/editor');
-          }}
-        >
-          Далі
-        </Button>
       </div>
     </div>
   );

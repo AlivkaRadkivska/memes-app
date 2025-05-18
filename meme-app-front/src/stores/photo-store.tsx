@@ -13,7 +13,7 @@ export interface Photo {
 interface PhotoState {
   photos: Photo[];
   addPhotos: (photos: Photo[]) => void;
-  updatePhoto: (id: string, preview: string) => void;
+  updatePhoto: (id: string, file: File, preview: string) => void;
   removePhoto: (id: string) => void;
   getPhoto: (id: string) => Photo | undefined;
 }
@@ -30,22 +30,41 @@ const getPhotoMeta = async (
 
 export const usePhotoStore = create<PhotoState>((set, get) => ({
   photos: [],
-  addPhotos: (newPhotos) =>
-    set((state) => {
-      newPhotos.forEach(async (photo) => {
+  addPhotos: async (newPhotos) => {
+    const updatedPhotos = await Promise.all(
+      newPhotos.map(async (photo) => {
         const res = await getPhotoMeta(photo.preview);
-        photo.height = res.naturalHeight;
-        photo.width = res.naturalWidth;
-      });
+        return {
+          ...photo,
+          height: res.naturalHeight,
+          width: res.naturalWidth,
+        };
+      })
+    );
 
-      return { photos: [...state.photos, ...newPhotos] };
-    }),
-  updatePhoto: (id, preview) =>
     set((state) => ({
-      photos: state.photos.map((photo) =>
-        photo.id === id ? { ...photo, preview, edited: true } : photo
-      ),
-    })),
+      photos: [...state.photos, ...updatedPhotos],
+    }));
+  },
+  updatePhoto: async (id, file, preview) => {
+    const res = await getPhotoMeta(preview);
+
+    set((state) => {
+      const updatedPhotos = state.photos.map((photo) =>
+        photo.id === id
+          ? {
+              ...photo,
+              file,
+              preview,
+              height: res.naturalHeight,
+              width: res.naturalWidth,
+            }
+          : photo
+      );
+
+      return { photos: [...updatedPhotos] };
+    });
+  },
   removePhoto: (id) =>
     set((state) => {
       const toRemove = state.photos.find((p) => p.id === id);

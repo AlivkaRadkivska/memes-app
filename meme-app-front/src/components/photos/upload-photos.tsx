@@ -5,13 +5,41 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { usePhotoStore } from '@/stores/photo-store';
 import { PlusCircle } from 'lucide-react';
-import { useRef } from 'react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { Input } from '../ui/input';
 
 export default function UploadPhotos() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addPhotos, photos } = usePhotoStore();
   const noPhotos = !photos || photos.length < 1;
+
+  const [aiPhotoUrl, setAiPhotoUrl] = useState('');
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const generateImage = async () => {
+    setLoading(true);
+    console.log(loading);
+    try {
+      const res = await fetch('/api/ai-meme', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data: { imageUrl: string } = await res.json();
+      if (data.imageUrl) setAiPhotoUrl(data.imageUrl);
+
+      console.log(data);
+    } catch (err) {
+      console.error('err', err);
+    }
+    setLoading(false);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -30,7 +58,7 @@ export default function UploadPhotos() {
     }
   };
 
-  const handleUploadClick = () => {
+  const handleUpload = () => {
     fileInputRef.current?.click();
   };
 
@@ -57,7 +85,27 @@ export default function UploadPhotos() {
         </CardContent>
       </Card>
 
+      <div className="p-4 max-w-lg mx-auto">
+        <Input
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Describe the image..."
+        />
+        <Button onClick={generateImage} disabled={loading} className="mt-4">
+          {loading ? 'Generating...' : 'Generate Image'}
+        </Button>
+
+        {aiPhotoUrl && (
+          <Image
+            src={aiPhotoUrl}
+            alt="AI generated"
+            className="mt-4 w-full rounded"
+          />
+        )}
+      </div>
+
       {!noPhotos && <PhotoGallery />}
+
       <div className="flex flex-col items-center justify-center py-12 bg-muted/30 rounded-lg border border-dashed">
         <PlusCircle className="h-12 w-12 text-muted-foreground mb-3" />
         <h2 className="text-xl font-medium mb-1">
@@ -68,7 +116,7 @@ export default function UploadPhotos() {
             Завантажте меми, щоб продовжити
           </p>
         )}
-        <Button className="mt-4" onClick={handleUploadClick}>
+        <Button className="mt-4" onClick={handleUpload}>
           Завантажити сюди
         </Button>
       </div>

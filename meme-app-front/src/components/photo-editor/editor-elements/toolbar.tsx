@@ -9,14 +9,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { EditorMode, useEditorStore } from '@/stores/editor-store';
-import {
-  Crop,
-  ImagePlus,
-  MousePointer,
-  Paintbrush,
-  Smile,
-  Type,
-} from 'lucide-react';
+import { Crop, ImagePlus, MousePointer, Smile, Type } from 'lucide-react';
 
 const tools = [
   {
@@ -43,11 +36,6 @@ const tools = [
     id: 'emoji',
     name: 'Emoji',
     icon: Smile,
-  },
-  {
-    id: 'draw',
-    name: 'Draw',
-    icon: Paintbrush,
   },
 ];
 

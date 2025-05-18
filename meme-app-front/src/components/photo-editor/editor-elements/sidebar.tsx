@@ -2,7 +2,6 @@ import { useEditorStore } from '@/stores/editor-store';
 import { Trash2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { CropPanel } from '../editor-panels/crop-panel';
-import { DrawingPanel } from '../editor-panels/drawing-panel';
 import { EmojisPanel } from '../editor-panels/emojis-panel';
 import { ImagePanel } from '../editor-panels/image-panel';
 import { TextProperties } from '../editor-panels/text-properties';
@@ -30,10 +29,6 @@ export function Sidebar() {
 
     if (mode === 'image') {
       return <ImagePanel />;
-    }
-
-    if (mode === 'draw') {
-      return <DrawingPanel />;
     }
 
     if (selectedObject) {

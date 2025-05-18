@@ -9,13 +9,6 @@ export function CropPanel() {
   const { isCropping, setIsCropping, cropConfig, setCropConfig, setMode } =
     useEditorStore();
 
-  // const handleApplyCrop = () => {
-  //   setIsCropping(false);
-  //   setCropConfig(null);
-  //   setMode('select');
-  //   addHistory();
-  // };
-
   const handleCancelCrop = () => {
     setIsCropping(false);
     setCropConfig(null);
