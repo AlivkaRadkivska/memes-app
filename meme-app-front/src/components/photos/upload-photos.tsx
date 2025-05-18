@@ -2,10 +2,9 @@
 
 import { PhotoGallery } from '@/components/photos/photo-gallery';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { usePhotoStore } from '@/stores/photo-store';
-import { PlusCircle } from 'lucide-react';
-import Image from 'next/image';
+import useGenerateImage from '@/server/hooks/publications/use-generate-image';
+import { Photo, usePhotoStore } from '@/stores/photo-store';
+import { Bot, ImagePlus, LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Input } from '../ui/input';
@@ -15,35 +14,18 @@ export default function UploadPhotos() {
   const { addPhotos, photos } = usePhotoStore();
   const noPhotos = !photos || photos.length < 1;
 
-  const [aiPhotoUrl, setAiPhotoUrl] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { generateImage, isLoading } = useGenerateImage();
 
-  const generateImage = async () => {
-    setLoading(true);
-    console.log(loading);
-    try {
-      const res = await fetch('/api/ai-meme', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
+  const isLimitReached = photos.length >= 8;
 
-      const data: { imageUrl: string } = await res.json();
-      if (data.imageUrl) setAiPhotoUrl(data.imageUrl);
-
-      console.log(data);
-    } catch (err) {
-      console.error('err', err);
-    }
-    setLoading(false);
+  const handleGenerateImage = () => {
+    generateImage(prompt);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newPhotos = Array.from(e.target.files).map((file) => {
+      const newPhotos: Photo[] = Array.from(e.target.files).map((file) => {
         return {
           id: uuid(),
           file,
@@ -51,6 +33,8 @@ export default function UploadPhotos() {
           name: file.name,
           width: 0,
           height: 0,
+          edited: false,
+          ai: false,
         };
       });
 
@@ -63,13 +47,28 @@ export default function UploadPhotos() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <Card className="border-none shadow-sm">
-        <CardHeader className="pb-2">
-          <h1 className="text-3xl font-bold">Почати створення публікації</h1>
-          <p className="text-muted-foreground">Сюди, сюди</p>
-        </CardHeader>
-        <CardContent>
+    <div className="max-w-7xl mx-auto space-y-8 h-full">
+      <div className="border-none shadow-sm">
+        <div className="w-full pb-2">
+          <div className="w-full gap-2 flex items-start justify-between">
+            <h1 className="text-3xl font-bold">Почати створення публікації</h1>
+            <Button
+              onClick={!isLimitReached ? handleUpload : undefined}
+              disabled={isLimitReached}
+            >
+              <ImagePlus className="w-8 h-8" />
+              Завантажити своє
+            </Button>
+          </div>
+          {photos.length > 8 ? (
+            <p className="text-destructive">
+              Можна публікувати максимум 8 зображень, тому деякі треба видалити
+            </p>
+          ) : (
+            <p className="text-muted-foreground">Давай сюди, але не більше 8</p>
+          )}
+        </div>
+        <div>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
             <div className="flex gap-2 w-full sm:w-auto">
               <input
@@ -82,43 +81,51 @@ export default function UploadPhotos() {
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="p-4 max-w-lg mx-auto">
-        <Input
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Describe the image..."
-        />
-        <Button onClick={generateImage} disabled={loading} className="mt-4">
-          {loading ? 'Generating...' : 'Generate Image'}
-        </Button>
-
-        {aiPhotoUrl && (
-          <Image
-            src={aiPhotoUrl}
-            alt="AI generated"
-            className="mt-4 w-full rounded"
-          />
-        )}
+        </div>
       </div>
 
       {!noPhotos && <PhotoGallery />}
+      {noPhotos && (
+        <div className="w-full flex flex-col items-center justify-center py-12">
+          {noPhotos && (
+            <div className="text-lg text-muted-foreground">
+              <p className="ml-8">мають бути ваші меми</p>
+              <p>
+                Тут <span className="line-through">може бути ваша реклама</span>
+                ...
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
-      <div className="flex flex-col items-center justify-center py-12 bg-muted/30 rounded-lg border border-dashed">
-        <PlusCircle className="h-12 w-12 text-muted-foreground mb-3" />
-        <h2 className="text-xl font-medium mb-1">
-          {noPhotos ? 'Ще нічого не додано' : 'Додати ще'}
-        </h2>
-        {noPhotos && (
-          <p className="text-muted-foreground">
-            Завантажте меми, щоб продовжити
+      <div className="flex items-center justify-center py-6 bg-muted/30 rounded-lg border border-dashed mt-auto">
+        <div className="gap-1 p-2 w-full flex flex-col items-center justify-center">
+          {isLoading ? (
+            <LoaderCircle className="w-12 h-12 text-muted-foreground mb-3 animate-spin duration-1000" />
+          ) : (
+            <Bot className="w-12 h-12 text-muted-foreground mb-3" />
+          )}
+          <p className="text-xl font-medium">
+            Додати зображення згенероване Ai
           </p>
-        )}
-        <Button className="mt-4" onClick={handleUpload}>
-          Завантажити сюди
-        </Button>
+          <p className="text-muted-foreground mb-2">Gemini, якщо точніше</p>
+          <div className="w-full flex gap-2 justify-center items-center mt-4">
+            <Input
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={isLoading || isLimitReached}
+              placeholder="Опишіть бажане зображення..."
+              className="max-w-96"
+            />
+            <Button
+              onClick={!isLimitReached ? handleGenerateImage : undefined}
+              disabled={isLoading || isLimitReached}
+            >
+              Згенерувати
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

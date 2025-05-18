@@ -1,38 +1,24 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { ArrowDownRight, Search } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { ArrowDownRight, Search } from 'lucide-react';
-import { useTheme } from 'next-themes';
 
 export function SearchInput() {
   const [expanded, setExpanded] = useState(false);
-  const { theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const themeClass = useMemo(() => {
-    if (!mounted) return 'bg-black text-white';
-    return (theme ?? resolvedTheme) === 'dark'
-      ? 'bg-black text-white'
-      : 'bg-white text-black';
-  }, [theme, resolvedTheme, mounted]);
 
   return (
     <div className="relative flex items-center gap-2 w-full">
       <div
-        className={`duration-300 absolute -top-4 mt-2 flex items-center p-2 gap-3 w-max max-w-none border-l ${themeClass} ${
+        className={`duration-300 absolute -top-4 mt-2 flex items-center p-2 gap-3 w-max max-w-none border-l bg-white text-black dark:bg-black dark:text-white ${
           expanded ? 'right-14 z-40' : 'opacity-0 -z-10 border-none right-0'
         }`}
       >
         <Label className="w-full min-w-72">
           <Input
             type="text"
-            placeholder="Напиши опис мему чи ім'я автора..."
+            placeholder="Напишіть опис мему чи ім'я автора..."
             autoFocus
             className="w-full px-4 py-2 text-lg"
           />

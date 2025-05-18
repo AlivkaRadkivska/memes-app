@@ -1,2 +1,4 @@
 const getPublications = () => ['get-publications'];
-export const queryKeys = { getPublications } as const;
+const generateAiImage = () => ['generate-ai-image'];
+
+export const queryKeys = { getPublications, generateAiImage } as const;

@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
-import { cn } from '@/lib/utils';
+import { cn } from '@/helpers/css-utils';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

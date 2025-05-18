@@ -7,7 +7,8 @@ export interface Photo {
   name: string;
   width: number;
   height: number;
-  edited?: boolean;
+  edited: boolean;
+  ai: boolean;
 }
 
 interface PhotoState {

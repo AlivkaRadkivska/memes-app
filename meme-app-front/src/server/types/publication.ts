@@ -1,4 +1,4 @@
-interface Author {
+export interface Author {
   id: string;
   username: string;
   fullName: string;
@@ -32,4 +32,9 @@ export interface PublicationFilters {
 
   limit?: number;
   page?: number;
+}
+
+export interface AiImageResponse {
+  mimeType: string;
+  base64: string;
 }

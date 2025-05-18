@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,18 +14,24 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { cn } from '@/helpers/css-utils';
 import { Publication } from '@/server/types/publication';
-import Loader from '@public/images/loader.png';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import {
+  EllipsisVertical,
+  Heart,
+  LoaderCircle,
+  MessageSquare,
+  Triangle,
+} from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogOverlay,
   DialogTitle,
-} from '@radix-ui/react-dialog';
-import { EllipsisVertical, Heart, MessageSquare, Triangle } from 'lucide-react';
-import Image from 'next/image';
-import { useState } from 'react';
+} from '../ui/dialog';
 
 interface PublicationCardProps {
   publication: Publication;
@@ -183,8 +188,8 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         open={!!selectedImage}
         onOpenChange={() => setSelectedImage(null)}
       >
-        <DialogOverlay className="fixed inset-0 bg-black/70 z-40" />
-        <DialogContent className="fixed inset-0 z-50 flex items-center justify-center p-0 bg-transparent border-none shadow-none">
+        <DialogOverlay />
+        <DialogContent>
           <VisuallyHidden>
             <DialogTitle>Full Image Preview</DialogTitle>
           </VisuallyHidden>
@@ -220,13 +225,7 @@ function ImageWithSkeleton({
     >
       {loading && (
         <Skeleton className="absolute top-0 right-0 inset-0 w-full h-full bg-background flex items-center justify-center z-10 animate-none">
-          <Image
-            src={Loader}
-            alt="image-loader"
-            width={100}
-            height={100}
-            className="animate-spin duration-1000 dark:invert"
-          />
+          <LoaderCircle className="w-36 h-36 animate-spin duration-100" />
         </Skeleton>
       )}
 

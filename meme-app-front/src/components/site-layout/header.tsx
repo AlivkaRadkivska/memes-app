@@ -45,7 +45,7 @@ export function Header() {
             className="w-min text-xl bold flex items-center justify-start"
             onClick={() => router.push('/')}
           >
-            <p>Meme&apos;s basement</p>
+            <p>Підвал з мемами</p>
           </Button>
         </div>
 

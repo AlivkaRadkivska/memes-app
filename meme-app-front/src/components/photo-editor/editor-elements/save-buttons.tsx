@@ -1,9 +1,10 @@
+import { base64ToFile } from '@/helpers/file-utils';
 import { useEditorStore } from '@/stores/editor-store';
 import { usePhotoStore } from '@/stores/photo-store';
 import { Download } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { Button } from '../../ui/button';
-import { useRouter } from 'next/navigation';
 
 interface ExportButtonProps {
   photoId: string;
@@ -31,25 +32,7 @@ export function ExportButton({ photoId }: ExportButtonProps) {
     context.drawImage(stage, 0, 0);
 
     const dataUrl = canvas.toDataURL('image/png');
-
-    // Convert DataURL to Blob
-    const byteString = atob(dataUrl.split(',')[1]);
-    const mimeString = dataUrl.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    const blob = new Blob([ab], { type: mimeString });
-    const file = new File([blob], `${photo.name}.png`, {
-      type: mimeString,
-      lastModified: Date.now(),
-    });
-
-    console.log(file);
-    console.log(URL.createObjectURL(file));
-
+    const file = base64ToFile(dataUrl, `${photo.name}.png`, 'image/png');
     return {
       url: dataUrl,
       preview: URL.createObjectURL(file),
