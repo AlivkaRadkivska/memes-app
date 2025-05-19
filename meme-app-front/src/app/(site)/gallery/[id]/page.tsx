@@ -1,14 +1,11 @@
-'use client';
-
 import PhotoEditor from '@/components/photo-editor/photo-editor';
-import { use } from 'react';
 
-interface EditorPageProps {
+interface GalleryPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EditorPage({ params }: EditorPageProps) {
-  const id = use(params).id;
+export default async function GalleryPage({ params }: GalleryPageProps) {
+  const { id } = await params;
 
   return (
     <div className="min-h-[calc(100vh-60px)] flex flex-col">

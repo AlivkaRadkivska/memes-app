@@ -51,7 +51,7 @@ export default function UploadPhotos() {
       <div className="border-none shadow-sm">
         <div className="w-full pb-2">
           <div className="w-full gap-2 flex items-start justify-between">
-            <h1 className="text-3xl font-bold">Почати створення публікації</h1>
+            <h1 className="text-3xl font-bold">Меми для публікації</h1>
             <Button
               onClick={!isLimitReached ? handleUpload : undefined}
               disabled={isLimitReached}

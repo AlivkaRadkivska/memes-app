@@ -63,20 +63,20 @@ export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
           )}
         </div>
       )}
-      {/* {isAuthenticated && ( */}
-      <Button
-        variant="default"
-        size={isCollapsed ? 'icon' : 'default'}
-        className={cn(
-          'w-full',
-          isCollapsed ? 'justify-center' : 'justify-start mt-5'
-        )}
-        onClick={() => router.push('/editor')}
-      >
-        <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
-        {!isCollapsed && 'Підкинути мемчиків'}
-      </Button>
-      {/* )} */}
+      {isAuthenticated && (
+        <Button
+          variant="default"
+          size={isCollapsed ? 'icon' : 'default'}
+          className={cn(
+            'w-full',
+            isCollapsed ? 'justify-center' : 'justify-start mt-5'
+          )}
+          onClick={() => router.push('/gallery')}
+        >
+          <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
+          {!isCollapsed && 'Підкинути мемчиків'}
+        </Button>
+      )}
     </div>
   );
 }
