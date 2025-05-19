@@ -3,11 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
-import { cn } from '@/lib/utils';
+import { cn } from '@/helpers/css-utils';
 import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
   const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const getInitials = (name: string) => {
     return name
@@ -19,9 +21,11 @@ export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
   return (
     <div className="flex flex-col items-center gap-4 p-4">
       <Avatar
-        className={`${
+        className={cn(
+          'transition-all duration-300 ease-in-out cursor-pointer',
           isCollapsed ? 'h-10 w-10' : 'h-20 w-20'
-        } transition-all duration-300 ease-in-out`}
+        )}
+        onClick={() => router.push('/profile')}
       >
         <AvatarImage
           src={'https://github.com/shadcn.png'}
@@ -67,7 +71,7 @@ export function MiniProfileSection({ isCollapsed }: { isCollapsed: boolean }) {
             'w-full',
             isCollapsed ? 'justify-center' : 'justify-start mt-5'
           )}
-          onClick={() => {}}
+          onClick={() => router.push('/gallery')}
         >
           <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
           {!isCollapsed && 'Підкинути мемчиків'}

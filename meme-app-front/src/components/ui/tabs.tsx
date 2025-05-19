@@ -1,8 +1,7 @@
 'use client';
-import * as React from 'react';
+import { cn } from '@/helpers/css-utils';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { cn } from '@/lib/utils';
-import { useTheme } from 'next-themes';
+import * as React from 'react';
 
 const Tabs = TabsPrimitive.Root;
 
@@ -10,24 +9,11 @@ const TabsList = React.forwardRef<
   React.ComponentRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => {
-  const { theme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const themeClass = mounted
-    ? theme === 'dark'
-      ? 'bg-slate-400 text-black'
-      : 'bg-slate-700 text-white'
-    : 'bg-black text-white';
-
   return (
     <TabsPrimitive.List
       ref={ref}
       className={cn(
-        `w-full inline-flex items-center justify-center rounded-md bg-muted py-1 px-2 text-muted-foreground ${themeClass} gap-1`,
+        `w-full inline-flex items-center justify-center rounded-md py-1 px-2 bg-black/20 text-black/70 dark:bg-white/20 dark:text-white gap-1`,
         className
       )}
       {...props}
@@ -66,4 +52,4 @@ const TabsContent = React.forwardRef<
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsContent, TabsList, TabsTrigger };

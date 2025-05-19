@@ -1,14 +1,14 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
-import { MiniProfileSection } from '../users/mini-profile-section';
-import { useState } from 'react';
-import { SidebarToggle } from '../ui/sidebar-toggle';
-import { Button } from '../ui/button';
+import { useAuth } from '@/contexts/auth-context';
+import { cn } from '@/helpers/css-utils';
 import { LogOut, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/auth-context';
+import { useState } from 'react';
+import { Button } from '../ui/button';
+import { SidebarToggle } from '../ui/sidebar-toggle';
+import { MiniProfileSection } from '../users/mini-profile-section';
 
 interface UserSidebarProps {
   className?: string;
@@ -33,7 +33,7 @@ export function UserSidebar({ className }: UserSidebarProps) {
       />
 
       <div className="flex flex-col h-full cursor-pointer">
-        <div className="pt-10" onClick={() => router.push('/profile')}>
+        <div className="pt-10">
           <MiniProfileSection isCollapsed={isCollapsed} />
         </div>
 
