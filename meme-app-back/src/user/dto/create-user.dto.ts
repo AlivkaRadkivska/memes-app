@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsEmail, IsDate, IsOptional, IsIn } from 'class-validator';
+import { IsDate, IsEmail, IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import { UserRole } from './user-role.dto';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -19,6 +20,6 @@ export class CreateUserDto {
   birthday?: Date;
 
   @IsNotEmpty()
-  @IsIn(['user', 'moderator'])
-  role: 'user' | 'moderator';
+  @IsIn(['user', 'moderator', 'admin'])
+  role: UserRole;
 }

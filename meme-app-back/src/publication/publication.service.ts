@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PublicationEntity } from './publication.entity';
+import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePublicationDto } from './dto/create-publication.dto';
-import { UserEntity } from 'src/user/user.entity';
-import { UpdatePublicationDto } from './dto/update-publication.dto';
-import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { PublicationFiltersDto } from './dto/publication-filters.dto';
+import { UpdatePublicationDto } from './dto/update-publication.dto';
+import { PublicationEntity } from './publication.entity';
 
 @Injectable()
 export class PublicationService {
@@ -19,10 +20,11 @@ export class PublicationService {
   async getAll(
     user?: UserEntity,
     filters?: PublicationFiltersDto,
-  ): Promise<PublicationEntity[]> {
+  ): Promise<PaginatedDataDto<PublicationEntity>> {
     const query = this.publicationRepository
       .createQueryBuilder('publication')
       .leftJoinAndSelect('publication.likes', 'likes')
+      .leftJoinAndSelect('likes.user', 'likeUser')
       .leftJoinAndSelect('publication.comments', 'comments')
       .leftJoinAndSelect('publication.author', 'author');
 
@@ -70,10 +72,22 @@ export class PublicationService {
       );
     }
 
-    const publications = await query.getMany();
+    const limit = Number(filters?.limit) || 3;
+    const page = Number(filters?.page) || 1;
+    const offset = (page - 1) * limit;
+
+    query.take(limit).skip(offset);
+
+    const [publications, total] = await query.getManyAndCount();
     publications.forEach((publication) => publication.setIsLiked(user));
 
-    return publications;
+    return {
+      items: publications,
+      totalItems: total,
+      limit,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async getOne(id: string, authorId?: string): Promise<PublicationEntity> {

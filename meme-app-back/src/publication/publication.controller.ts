@@ -15,16 +15,17 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { PublicationService } from './publication.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { UserEntity } from 'src/user/user.entity';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { UpdatePublicationDto } from './dto/update-publication.dto';
-import { CreatePublicationDto } from './dto/create-publication.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard';
-import { PublicationEntity } from './publication.entity';
+import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
+import { UserEntity } from 'src/user/user.entity';
+import { CreatePublicationDto } from './dto/create-publication.dto';
 import { PublicationFiltersDto } from './dto/publication-filters.dto';
+import { UpdatePublicationDto } from './dto/update-publication.dto';
+import { PublicationEntity } from './publication.entity';
+import { PublicationService } from './publication.service';
 
 @Controller('publication')
 export class PublicationController {
@@ -36,7 +37,7 @@ export class PublicationController {
   getPublications(
     @GetUser() user?: UserEntity,
     @Query() filters?: PublicationFiltersDto,
-  ): Promise<PublicationEntity[]> {
+  ): Promise<PaginatedDataDto<PublicationEntity>> {
     return this.publicationService.getAll(user, filters);
   }
 

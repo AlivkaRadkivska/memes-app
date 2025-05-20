@@ -5,10 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
+import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
+import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UserService {
@@ -17,7 +18,9 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async getAll(filters?: UserFiltersDto): Promise<UserEntity[]> {
+  async getAll(
+    filters?: UserFiltersDto,
+  ): Promise<PaginatedDataDto<UserEntity>> {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.followers', 'followers')
@@ -51,9 +54,21 @@ export class UserService {
       );
     }
 
-    const users = await query.getMany();
+    const limit = Number(filters?.limit) || 10;
+    const page = Number(filters?.page) || 1;
+    const offset = (page - 1) * limit;
 
-    return users;
+    query.take(limit).skip(offset);
+
+    const [users, total] = await query.getManyAndCount();
+
+    return {
+      items: users,
+      totalItems: total,
+      limit,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async getOne(id?: string, email?: string): Promise<UserEntity> {
@@ -61,7 +76,7 @@ export class UserService {
       relations: ['followers', 'followings'],
       where: [{ id }, { email }],
     });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('Користувача не знайдено');
 
     return user;
   }
@@ -74,7 +89,7 @@ export class UserService {
       return user;
     } catch (error) {
       if (error.code == 23505)
-        throw new ConflictException(['Email is already taken']);
+        throw new ConflictException(['Email вже зайнятий']);
       else {
         console.error(error);
         throw new InternalServerErrorException();
