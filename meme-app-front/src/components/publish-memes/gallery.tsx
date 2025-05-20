@@ -26,7 +26,7 @@ import {
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
-export function PhotoGallery() {
+export function Gallery() {
   const router = useRouter();
   const { photos, removePhoto } = usePhotoStore();
   const { addObject, setSelectedObjectId } = useEditorStore();

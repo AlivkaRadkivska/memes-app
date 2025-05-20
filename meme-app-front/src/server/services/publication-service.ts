@@ -4,6 +4,7 @@ import {
   AiImageResponse,
   Publication,
   PublicationFilters,
+  PublishMemesPayload,
 } from '../types/publication';
 
 export const fetchPublications = async (
@@ -25,4 +26,23 @@ export const generateAiImage = async (
   }).then((res) => res.json());
 
   return response;
+};
+
+export const publishMemes = async (
+  data: PublishMemesPayload
+): Promise<Publication> => {
+  const formData = new FormData();
+  formData.append('description', data.description);
+  formData.append('status', data.status);
+  data.keywords.forEach((keyword) => {
+    formData.append('keywords[]', keyword);
+  });
+  data.pictures.forEach((picture) => {
+    formData.append('pictures', picture, picture.name);
+  });
+
+  const response = await axiosInstance.post('/publication', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 };

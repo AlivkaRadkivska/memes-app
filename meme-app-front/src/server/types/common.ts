@@ -5,3 +5,9 @@ export interface PaginatedData<T> {
   page: number;
   totalPages: number;
 }
+
+export interface CommonError {
+  message: string[];
+  error: string;
+  statusCode: number;
+}

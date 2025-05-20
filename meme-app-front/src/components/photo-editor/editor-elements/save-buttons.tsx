@@ -12,11 +12,13 @@ interface ExportButtonProps {
 
 export function ExportButton({ photoId }: ExportButtonProps) {
   const { getPhoto, updatePhoto } = usePhotoStore();
-  const { clearObjects } = useEditorStore();
+  const { clearObjects, setSelectedObjectId } = useEditorStore();
   const router = useRouter();
   const linkRef = useRef<HTMLAnchorElement>(null);
 
   const getPhotoData = () => {
+    setSelectedObjectId(null);
+
     const photo = getPhoto(photoId);
     if (!photo) return null;
 
@@ -41,6 +43,8 @@ export function ExportButton({ photoId }: ExportButtonProps) {
   };
 
   const handleExport = () => {
+    setSelectedObjectId(null);
+
     const photo = getPhoto(photoId);
     const photoData = getPhotoData();
     if (!photo || !photoData) return;
@@ -58,7 +62,7 @@ export function ExportButton({ photoId }: ExportButtonProps) {
 
     updatePhoto(photoId, photoData.file, photoData.preview);
     clearObjects();
-    router.push('/editor');
+    router.push('/gallery');
   };
 
   return (

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const protectedPaths = ['/admin', '/profile', '/editor'];
+const protectedPaths = ['/admin', '/profile', '/gallery'];
 const authPaths = ['/', '/login', '/signup'];
 
 export function middleware(request: NextRequest) {

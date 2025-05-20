@@ -22,6 +22,13 @@ export interface Publication {
   isLiked: boolean;
 }
 
+export interface PublishMemesPayload {
+  pictures: File[];
+  description: string;
+  keywords: string[];
+  status: 'active' | 'hidden';
+}
+
 export interface PublicationFilters {
   keywords?: string;
   status?: string;

@@ -1,32 +1,42 @@
-'use client';
-
 import { useAuth } from '@/contexts/auth-context';
 import { loginWithCredentials } from '@/server/services/auth-service';
-import { LoginCredentials } from '@/server/types/auth';
+import { AuthResult, LoginCredentials } from '@/server/types/auth';
+import { CommonError } from '@/server/types/common';
+import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
-export const useLogin = () => {
-  const [isPending, setIsPending] = useState(false);
-  const [errors, setErrors] = useState<string[] | null>(null);
+export default function useLogin(
+  options?: UseMutationOptions<
+    AuthResult,
+    AxiosError<CommonError>,
+    LoginCredentials
+  >
+) {
+  const router = useRouter();
   const { setAuthFromRedirect } = useAuth();
+  const [errors, setErrors] = useState<string[] | undefined>(undefined);
 
-  const mutate = async (credentials: LoginCredentials) => {
-    setIsPending(true);
-    setErrors(null);
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: (data) => loginWithCredentials(data),
+    onSuccess: (response) => {
+      setAuthFromRedirect(response.accessToken, JSON.stringify(response.user));
+      router.push('/');
+    },
+    onError: (err) => {
+      console.error('API Error:', err);
+      if (err.response?.data.statusCode.toString().startsWith('5'))
+        toast('Щось пішло не так...');
+      else setErrors(err.response?.data.message);
+    },
+    ...options,
+  });
 
-    try {
-      const result = await loginWithCredentials(credentials);
-      setAuthFromRedirect(result.accessToken, JSON.stringify(result.user));
-      return result;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setErrors(err.response.data.message);
-      throw err;
-    } finally {
-      setIsPending(false);
-    }
+  return {
+    login,
+    isPending,
+    errors,
   };
-
-  return { mutate, isPending, errors };
-};
+}

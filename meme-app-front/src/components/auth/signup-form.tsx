@@ -1,167 +1,212 @@
 'use client';
 
-import { useSignup } from '@/server/hooks/auth/use-signup';
-import { SignupCredentials } from '@/server/types/auth';
+import { cn } from '@/helpers/css-utils';
+import {
+  SignupFormData,
+  signupFormSchema,
+} from '@/helpers/schemas/signup.schema';
+import useSignup from '@/server/hooks/auth/use-signup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { LoaderCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button';
 import { DatePicker } from '../ui/date-picker';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 
 export default function SignupForm() {
-  const router = useRouter();
-  const { mutate: signup, isPending, errors } = useSignup();
+  const { signup, isPending, errors } = useSignup();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [birthday, setBirthday] = useState<Date | undefined>(undefined);
+  const form = useForm<SignupFormData>({
+    resolver: zodResolver(signupFormSchema),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+      repeatPassword: '',
+    },
+  });
 
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
-
-  useEffect(() => {
-    if (password) setPasswordsMatch(password === repeatPassword);
-  }, [password, repeatPassword]);
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!passwordsMatch || !birthday) {
-      return;
-    }
-
-    const signupData: SignupCredentials = {
-      email,
-      username,
-      password,
-      repeatPassword,
-      fullName,
-      birthday,
-    };
-
-    try {
-      await signup(signupData);
-      router.push('/');
-    } catch {}
-  };
+  function onSubmit(data: SignupFormData) {
+    signup(data);
+  }
 
   return (
-    <form onSubmit={handleSignup} className="flex flex-col w-full gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input
-          id="signup-email"
-          type="email"
-          placeholder="Your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoComplete="email"
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-username">Нікнейм</Label>
-        <Input
-          id="signup-username"
-          type="text"
-          placeholder="Choose a username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          autoComplete="username"
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-fullname">
-          Повне ім&apos;я (не обов&apos;язково)
-        </Label>
-        <Input
-          id="signup-fullname"
-          type="text"
-          placeholder="Your full name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-          autoComplete="name"
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-birthday">
-          Дата народження (не обов&apos;язково)
-        </Label>
-        <DatePicker
-          date={birthday}
-          setDate={setBirthday}
-          className="w-full"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-password">Пароль</Label>
-        <Input
-          id="signup-password"
-          type="password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="new-password"
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-repeat-password">Повторіть Пароль</Label>
-        <Input
-          id="signup-repeat-password"
-          type="password"
-          placeholder="••••••••"
-          value={repeatPassword}
-          onChange={(e) => setRepeatPassword(e.target.value)}
-          required
-          autoComplete="new-password"
-          className={`w-full ${
-            !passwordsMatch && repeatPassword ? 'border-destructive' : ''
-          }`}
-        />
-        {!passwordsMatch && (
-          <p className="text-destructive text-sm">Пароль має співпадати</p>
-        )}
-      </div>
-
-      {errors &&
-        errors.length > 0 &&
-        errors.map((error) => (
-          <p key={error} className="text-destructive text-sm mt-2">
-            {error}
-          </p>
-        ))}
-
-      <Button
-        type="submit"
-        disabled={isPending || !passwordsMatch || !email || !username}
-        className="w-full mt-2"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col w-full gap-4"
       >
-        {isPending ? (
-          <>
-            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-            Завантаження...
-          </>
-        ) : (
-          'Зареєструватися'
-        )}
-      </Button>
-    </form>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">Email</FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <Input
+                    placeholder="user@mail.com"
+                    className={cn(
+                      'resize-none transition-all w-full',
+                      field.value.length > 0 && 'pr-16'
+                    )}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">Нікнейм</FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <Input
+                    placeholder="meme_lover_#1"
+                    className={cn(
+                      'resize-none transition-all w-full',
+                      field.value.length > 0 && 'pr-16'
+                    )}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">
+                Повне ім&apos;я (не обов&apos;язково)
+              </FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <Input
+                    placeholder="Name Surname"
+                    className={cn(
+                      'resize-none transition-all w-full',
+                      field.value && field.value.length > 0 && 'pr-16'
+                    )}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="birthday"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">
+                Дата народження (не обов&apos;язково)
+              </FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <DatePicker
+                    date={field.value}
+                    setDate={field.onChange}
+                    className={'resize-none transition-all w-full'}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">Пароль</FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <Input
+                    type="password"
+                    placeholder="𓁹"
+                    className={cn(
+                      'resize-none transition-all w-full',
+                      field.value.length > 0 && 'pr-16'
+                    )}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="repeatPassword"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">
+                Повторіть пароль
+              </FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <Input
+                    type="password"
+                    placeholder="𓁹"
+                    className={cn(
+                      'resize-none transition-all w-full',
+                      field.value.length > 0 && 'pr-16'
+                    )}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {errors &&
+          errors.length > 0 &&
+          errors.map((error) => (
+            <p key={error} className="text-destructive text-sm mt-2">
+              {error}
+            </p>
+          ))}
+
+        <Button type="submit" disabled={isPending} className="w-full mt-2">
+          {isPending ? (
+            <>
+              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+              Завантаження...
+            </>
+          ) : (
+            'Зареєструватися'
+          )}
+        </Button>
+      </form>
+    </Form>
   );
 }

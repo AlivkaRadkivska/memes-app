@@ -10,8 +10,8 @@ export interface SignupCredentials {
   username: string;
   password: string;
   repeatPassword: string;
-  fullName: string;
-  birthday: Date;
+  fullName?: string;
+  birthday?: Date;
 }
 
 export interface AuthResult {
