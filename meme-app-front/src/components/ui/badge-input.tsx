@@ -64,7 +64,7 @@ export const BadgeInput = ({
         <Badge
           key={tag}
           variant="secondary"
-          className="text-sm px-2 py-1 gap-1.5 group transition-all hover:bg-secondary/80"
+          className="text-sm px-2 py-0 gap-1.5 group transition-all hover:bg-secondary/80"
         >
           {tag}
           <button

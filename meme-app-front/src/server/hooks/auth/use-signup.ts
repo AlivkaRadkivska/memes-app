@@ -1,32 +1,42 @@
-'use client';
-
 import { useAuth } from '@/contexts/auth-context';
 import { signupWithCredentials } from '@/server/services/auth-service';
-import { SignupCredentials } from '@/server/types/auth';
+import { AuthResult, SignupCredentials } from '@/server/types/auth';
+import { CommonError } from '@/server/types/common';
+import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
-export const useSignup = () => {
-  const [isPending, setIsPending] = useState(false);
-  const [errors, setErrors] = useState<string[] | null>(null);
+export default function useSignup(
+  options?: UseMutationOptions<
+    AuthResult,
+    AxiosError<CommonError>,
+    SignupCredentials
+  >
+) {
+  const router = useRouter();
   const { setAuthFromRedirect } = useAuth();
+  const [errors, setErrors] = useState<string[] | undefined>(undefined);
 
-  const mutate = async (credentials: SignupCredentials) => {
-    setIsPending(true);
-    setErrors(null);
+  const { mutate: signup, isPending } = useMutation({
+    mutationFn: (data) => signupWithCredentials(data),
+    onSuccess: (response) => {
+      setAuthFromRedirect(response.accessToken, JSON.stringify(response.user));
+      router.push('/');
+    },
+    onError: (err) => {
+      console.error('API Error:', err);
+      if (err.response?.data.statusCode.toString().startsWith('5'))
+        toast('Щось пішло не так...');
+      else setErrors(err.response?.data.message);
+    },
+    ...options,
+  });
 
-    try {
-      const result = await signupWithCredentials(credentials);
-      setAuthFromRedirect(result.accessToken, JSON.stringify(result.user));
-      return result;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error('Signup error:', err);
-      setErrors(err.response.data.message);
-      throw err;
-    } finally {
-      setIsPending(false);
-    }
+  return {
+    signup,
+    isPending,
+    errors,
   };
-
-  return { mutate, isPending, errors };
-};
+}

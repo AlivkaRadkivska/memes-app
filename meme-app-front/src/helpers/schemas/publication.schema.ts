@@ -1,10 +1,5 @@
 import * as z from 'zod';
 
-export interface PublicationFormData {
-  description: string;
-  keywords: string[];
-  status: 'active' | 'hidden';
-}
 export const publicationFormSchema = z.object({
   description: z
     .string()
@@ -16,3 +11,5 @@ export const publicationFormSchema = z.object({
     .max(15, { message: 'Має бути не більше 15-ти елементів' }),
   status: z.enum(['hidden', 'active'] as const),
 });
+
+export type PublicationFormData = z.infer<typeof publicationFormSchema>;
