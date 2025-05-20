@@ -45,7 +45,7 @@ export function Gallery() {
       draggable: true,
     });
 
-    router.push(`/editor/${id}`);
+    router.push(`/gallery/${id}`);
     setSelectedObjectId(null);
   };
 

@@ -22,7 +22,7 @@ export function ActionsBar({ photoId }: ActionsBarProps) {
         variant="outline"
         onClick={() => {
           clearObjects();
-          router.push('/editor');
+          router.push('/gallery');
         }}
       >
         <CircleX size={16} />

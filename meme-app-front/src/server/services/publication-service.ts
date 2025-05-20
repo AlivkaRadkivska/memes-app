@@ -31,21 +31,18 @@ export const generateAiImage = async (
 export const publishMemes = async (
   data: PublishMemesPayload
 ): Promise<Publication> => {
-  console.log('data', data);
   const formData = new FormData();
   formData.append('description', data.description);
   formData.append('status', data.status);
-  data.pictures.map((keyword) => {
+  data.keywords.forEach((keyword) => {
     formData.append('keywords[]', keyword);
   });
-  data.pictures.map((picture) => {
-    formData.append('pictures', picture);
+  data.pictures.forEach((picture) => {
+    formData.append('pictures', picture, picture.name);
   });
 
   const response = await axiosInstance.post('/publication', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
   return response.data;
 };

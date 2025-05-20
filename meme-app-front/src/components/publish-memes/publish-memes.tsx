@@ -31,7 +31,6 @@ export default function PublishMemes() {
   });
 
   async function onSubmit(data: PublicationFormData) {
-    console.log(photos);
     publish({ ...data, pictures: photos.map((photo) => photo.file) });
   }
 
