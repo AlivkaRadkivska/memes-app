@@ -51,6 +51,7 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "universal-cookie": "^8.0.1",
+    "use-debounce": "^10.0.4",
     "use-image": "^1.1.1",
     "uuid": "^11.1.0",
     "zod": "^3.25.6",

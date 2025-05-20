@@ -20,17 +20,12 @@ export function PublicationsContainer() {
     <div>
       {data?.pages.flatMap((page) =>
         page.items.map((publication) => (
-          <PublicationCard
-            key={publication.id}
-            publication={publication}
-            onLike={() => {}}
-            onComment={() => {}}
-          />
+          <PublicationCard key={publication.id} publication={publication} />
         ))
       )}
 
       {isFetchingNextPage && (
-        <p className="text-center text-sm">Завантаження...</p>
+        <p className="text-center text-sm p-4">Завантаження...</p>
       )}
       <div ref={ref} className="h-10" />
     </div>

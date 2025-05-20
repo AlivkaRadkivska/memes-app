@@ -14,18 +14,23 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
+import { formatCount } from '@/helpers/publication-utils';
+import useLike from '@/server/hooks/publications/use-like';
 import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   EllipsisVertical,
   Heart,
+  HeartHandshake,
   LoaderCircle,
   MessageSquare,
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import {
   Dialog,
   DialogContent,
@@ -35,26 +40,17 @@ import {
 
 interface PublicationCardProps {
   publication: Publication;
-  onLike: (id: string) => void;
-  onComment: (id: string) => void;
 }
-
-const formatCount = (count: number) =>
-  count >= 1_000_000_000
-    ? Math.round(count / 1_000_000_000) + 'B'
-    : count >= 1_000_000
-    ? Math.round(count / 1_000_000) + 'M'
-    : count >= 1_000
-    ? Math.round(count / 1_000) + 'K'
-    : count;
 
 export const PublicationCard: React.FC<PublicationCardProps> = ({
   publication,
-  onLike,
-  onComment,
 }) => {
   const [isDescCollapsed, setIsDescCollapsed] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [justLiked, setJustLiked] = useState(publication.isLiked);
+
+  const { like } = useLike();
+  const { isAuthenticated } = useAuth();
 
   const {
     id,
@@ -62,12 +58,16 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     description,
     keywords,
     author,
-    isLiked,
     likeCount,
     commentCount,
     isBanned,
     banReason,
   } = publication;
+
+  const handleLikeDebounced = useDebouncedCallback(() => {
+    setJustLiked((prev) => !prev);
+    like({ publicationId: id, isLiked: justLiked });
+  }, 700);
 
   return (
     <>
@@ -166,14 +166,23 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               <div className="flex items-center mt-auto z-10">
                 <Button
                   variant="ghost"
-                  onClick={() => onLike(id)}
-                  className={cn('flex items-center', isLiked && 'text-red-500')}
+                  onClick={handleLikeDebounced}
+                  className={cn(
+                    'flex items-center',
+                    justLiked && 'text-red-500'
+                  )}
+                  disabled={!isAuthenticated}
                 >
-                  <Heart size={18} /> {formatCount(likeCount)}
+                  {justLiked ? (
+                    <HeartHandshake size={18} />
+                  ) : (
+                    <Heart size={18} />
+                  )}
+                  {formatCount(justLiked ? likeCount + 1 : likeCount)}
                 </Button>
                 <Button
                   variant="ghost"
-                  onClick={() => onComment(id)}
+                  // onClick={() => onComment(id)}
                   className="flex items-center"
                 >
                   <MessageSquare size={18} /> {formatCount(commentCount)}
