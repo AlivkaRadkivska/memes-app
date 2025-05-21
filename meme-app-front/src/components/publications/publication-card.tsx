@@ -25,34 +25,27 @@ import {
   Heart,
   HeartHandshake,
   LoaderCircle,
-  MessageSquare,
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
+import { CommentSection } from '../comments/comment-section';
 import {
   Dialog,
   DialogContent,
   DialogOverlay,
   DialogTitle,
 } from '../ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Separator } from '../ui/separator';
 
 interface PublicationCardProps {
   publication: Publication;
 }
 
 export const PublicationCard: React.FC<PublicationCardProps> = ({
-  publication,
-}) => {
-  const [isDescCollapsed, setIsDescCollapsed] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [justLiked, setJustLiked] = useState(publication.isLiked);
-
-  const { like } = useLike();
-  const { isAuthenticated } = useAuth();
-
-  const {
+  publication: {
     id,
     pictures,
     description,
@@ -60,18 +53,29 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     author,
     likeCount,
     commentCount,
-    isBanned,
-    banReason,
-  } = publication;
+    comments,
+    isLiked,
+  },
+}) => {
+  const [isDescCollapsed, setIsDescCollapsed] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [justLiked, setJustLiked] = useState(isLiked);
+
+  const { like } = useLike();
+  const { isAuthenticated } = useAuth();
 
   const handleLikeDebounced = useDebouncedCallback(() => {
     setJustLiked((prev) => !prev);
     like({ publicationId: id, isLiked: justLiked });
-  }, 700);
+  }, 500);
+
+  useEffect(() => {
+    if (!isAuthenticated) setJustLiked(false);
+  }, [isAuthenticated]);
 
   return (
     <>
-      <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-x-0 p-0">
+      <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0">
         <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
           <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
             <Avatar className="w-16 h-16">
@@ -89,9 +93,18 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             </div>
           </div>
           <div className="flex items-center">
-            <Button variant="ghost" className="w-6">
-              <EllipsisVertical />
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="w-6">
+                  <EllipsisVertical size={16} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-min text-nowrap p-1" align="end">
+                <Button variant="link">Підписатися</Button>
+                <Separator />
+                <Button variant="link">Скачати меми собі</Button>
+              </PopoverContent>
+            </Popover>
           </div>
         </CardHeader>
 
@@ -124,74 +137,61 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         </CardContent>
 
         <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
-          {isBanned ? (
-            <p className="text-red-500 text-sm font-semibold">
-              Цей пост заборонений для перегляду. Причина: {banReason}
-            </p>
-          ) : (
-            <>
-              <div
+          <div
+            className={cn(
+              'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[80%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
+              isDescCollapsed ? 'max-h-10' : 'max-h-[500%]'
+            )}
+            style={{
+              transition:
+                'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
+            }}
+            onClick={() => setIsDescCollapsed((prev) => !prev)}
+          >
+            <Button variant="ghost" className="[&_svg]:size-4">
+              <Triangle
                 className={cn(
-                  'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[85%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
-                  isDescCollapsed ? 'max-h-12' : 'max-h-[500%]'
+                  'transition-all duration-500 ease-in-out',
+                  isDescCollapsed ? 'rotate-0' : 'rotate-[60deg]'
                 )}
-                style={{
-                  transition:
-                    'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
-                }}
-                onClick={() => setIsDescCollapsed((prev) => !prev)}
-              >
-                <Button variant="ghost" className="[&_svg]:size-4">
-                  <Triangle
-                    className={cn(
-                      'transition-all duration-500 ease-in-out',
-                      isDescCollapsed ? 'rotate-0' : 'rotate-180'
-                    )}
-                  />
-                </Button>
-                <div className="flex flex-col gap-5">
-                  <p className="mt-2">{description}</p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    #{keywords.join(' #')}
-                  </p>
-                </div>
-                <div
-                  className={cn(
-                    'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
-                    isDescCollapsed ? 'h-full ' : 'h-[150%]'
-                  )}
-                ></div>
-              </div>
+              />
+            </Button>
+            <div className="flex flex-col gap-5">
+              <p className="mt-2">{description}</p>
+              <p className="mt-1 text-sm text-gray-500">
+                #{keywords.join(' #')}
+              </p>
+            </div>
+            <div
+              className={cn(
+                'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
+                isDescCollapsed ? 'h-full ' : 'h-[150%]'
+              )}
+            />
+          </div>
 
-              <div className="flex items-center mt-auto z-10">
-                <Button
-                  variant="ghost"
-                  onClick={handleLikeDebounced}
-                  className={cn(
-                    'flex items-center',
-                    justLiked && 'text-red-500'
-                  )}
-                  disabled={!isAuthenticated}
-                >
-                  {justLiked ? (
-                    <HeartHandshake size={18} />
-                  ) : (
-                    <Heart size={18} />
-                  )}
-                  {formatCount(justLiked ? likeCount + 1 : likeCount)}
-                </Button>
-                <Button
-                  variant="ghost"
-                  // onClick={() => onComment(id)}
-                  className="flex items-center"
-                >
-                  <MessageSquare size={18} /> {formatCount(commentCount)}
-                </Button>
-              </div>
-            </>
-          )}
+          <div className="flex items-center mt-auto z-10">
+            <Button
+              variant="ghost"
+              onClick={handleLikeDebounced}
+              className={cn(
+                'flex items-center [&_svg]:size-6',
+                justLiked && 'text-red-500'
+              )}
+              disabled={!isAuthenticated}
+            >
+              {justLiked ? <HeartHandshake size={24} /> : <Heart size={24} />}
+              {formatCount(justLiked ? likeCount + 1 : likeCount)}
+            </Button>
+          </div>
         </CardFooter>
       </Card>
+
+      <CommentSection
+        publicationId={id}
+        initialComments={comments}
+        commentCount={commentCount}
+      />
 
       <Dialog
         open={!!selectedImage}

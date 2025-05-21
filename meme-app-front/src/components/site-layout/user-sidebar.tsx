@@ -22,7 +22,7 @@ export function UserSidebar({ className }: UserSidebarProps) {
   return (
     <aside
       className={cn(
-        'sticky top-[80px] group flex h-[calc(100vh-80px)] flex-col border-l bg-background transition-all duration-300 ease-in-out',
+        'sticky top-[80px] group flex h-[calc(100vh-80px)] flex-col border-l border-muted-foreground bg-background transition-all duration-300 ease-in-out',
         isCollapsed ? 'w-[70px]' : 'w-[240px]',
         className
       )}

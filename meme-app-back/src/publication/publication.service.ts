@@ -26,6 +26,7 @@ export class PublicationService {
       .leftJoinAndSelect('publication.likes', 'likes')
       .leftJoinAndSelect('likes.user', 'likeUser')
       .leftJoinAndSelect('publication.comments', 'comments')
+      .leftJoinAndSelect('comments.user', 'commentUser')
       .leftJoinAndSelect('publication.author', 'author');
 
     if (filters?.keywords && filters.keywords.length > 0) {
