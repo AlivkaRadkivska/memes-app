@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { FollowService } from 'src/follow/follow.service';
 import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePublicationDto } from './dto/create-publication.dto';
@@ -15,6 +16,7 @@ export class PublicationService {
     @InjectRepository(PublicationEntity)
     private publicationRepository: Repository<PublicationEntity>,
     private fileUploadService: FileUploadService,
+    private followService: FollowService,
   ) {}
 
   async getAll(
@@ -79,7 +81,12 @@ export class PublicationService {
     query.take(limit).skip(offset);
 
     const [publications, total] = await query.getManyAndCount();
-    publications.forEach((publication) => publication.setIsLiked(user));
+    const follows = await this.followService.getAllByFollower(user.id);
+
+    publications.forEach((publication) => {
+      publication.setIsLiked(user);
+      publication.setIsFollowing(user, follows);
+    });
 
     return {
       items: publications,

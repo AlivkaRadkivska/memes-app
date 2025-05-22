@@ -22,6 +22,7 @@ export interface Publication {
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
+  isFollowing: boolean;
 
   comments: Comment[];
 }

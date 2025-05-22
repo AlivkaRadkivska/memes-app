@@ -18,6 +18,8 @@ import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
 import { formatCount } from '@/helpers/publication-utils';
 import useLike from '@/server/hooks/publications/use-like';
+import useFollow from '@/server/hooks/users/use-follow';
+import useUnfollow from '@/server/hooks/users/use-unfollow';
 import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -25,6 +27,7 @@ import {
   Heart,
   HeartHandshake,
   LoaderCircle,
+  PawPrint,
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -53,14 +56,17 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     author,
     likeCount,
     isLiked,
+    isFollowing,
   },
 }) => {
   const [isDescCollapsed, setIsDescCollapsed] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [justLiked, setJustLiked] = useState(isLiked);
 
-  const { like } = useLike();
   const { isAuthenticated } = useAuth();
+  const { like, isPending: isPendingLike } = useLike();
+  const { follow, isPending: isPendingFollow } = useFollow();
+  const { unfollow, isPending: isPendingUnfollow } = useUnfollow();
 
   const handleLikeDebounced = useDebouncedCallback(() => {
     setJustLiked((prev) => !prev);
@@ -83,11 +89,20 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               />
               <AvatarFallback>{author.username}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
-              <p className="font-semibold text-lg">
-                {author.fullName || author.username}
-              </p>
-              <p className="text-sm -mt-1">@{author.username}</p>
+            <div className="flex flex-col gap-2 -mt-2">
+              <div className="flex gap-2 items-center">
+                <p className="font-semibold text-xl">{author.username}</p>
+                {isFollowing && (
+                  <Button
+                    variant="default"
+                    className="[&_svg]:size-4 w-1 h-6"
+                    disabled
+                  >
+                    <PawPrint />
+                  </Button>
+                )}
+              </div>
+              <p className="text-sm -mt-1">{author.email}</p>
             </div>
           </div>
           <div className="flex items-center">
@@ -98,7 +113,19 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-min text-nowrap p-1" align="end">
-                <Button variant="link">Підписатися</Button>
+                <Button
+                  variant="link"
+                  onClick={
+                    isFollowing
+                      ? () => unfollow(author.id)
+                      : () => follow(author.id)
+                  }
+                  disabled={
+                    !isAuthenticated || isPendingFollow || isPendingUnfollow
+                  }
+                >
+                  {isFollowing ? 'Відписатися' : 'Підписатися'}
+                </Button>
                 <Separator />
                 <Button variant="link">Скачати меми собі</Button>
               </PopoverContent>
@@ -176,7 +203,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
                 'flex items-center [&_svg]:size-6',
                 justLiked && 'text-red-500'
               )}
-              disabled={!isAuthenticated}
+              disabled={!isAuthenticated || isPendingLike}
             >
               {justLiked ? <HeartHandshake size={24} /> : <Heart size={24} />}
               {formatCount(justLiked ? likeCount + 1 : likeCount)}
