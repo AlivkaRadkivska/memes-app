@@ -60,7 +60,7 @@ export class FileUploadService {
       })
       .toBuffer();
 
-    return new File([resizedBuffer], newName, {
+    return new File([resizedBuffer as BlobPart], newName, {
       type: file.mimetype,
     });
   }

@@ -52,8 +52,6 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     keywords,
     author,
     likeCount,
-    commentCount,
-    comments,
     isLiked,
   },
 }) => {
@@ -164,7 +162,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             </div>
             <div
               className={cn(
-                'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
+                'absolute bottom-0 w-[150%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
                 isDescCollapsed ? 'h-full ' : 'h-[150%]'
               )}
             />
@@ -187,11 +185,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         </CardFooter>
       </Card>
 
-      <CommentSection
-        publicationId={id}
-        initialComments={comments}
-        commentCount={commentCount}
-      />
+      <CommentSection publicationId={id} />
 
       <Dialog
         open={!!selectedImage}

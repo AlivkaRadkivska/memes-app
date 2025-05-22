@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   Collapsible,
@@ -8,30 +6,32 @@ import {
 } from '@/components/ui/collapsible';
 import { cn } from '@/helpers/css-utils';
 import { formatCount } from '@/helpers/publication-utils';
-import { Comment } from '@/server/types/comment';
+import useGetComments from '@/server/hooks/comments/use-get-comment';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { CommentForm } from './comment-form';
 import { CommentItem } from './comment-item';
 
 interface CommentSectionProps {
   publicationId: string;
-  initialComments: Comment[];
-  commentCount: number;
 }
 
-export function CommentSection({
-  publicationId,
-  initialComments,
-  commentCount,
-}: CommentSectionProps) {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+export function CommentSection({ publicationId }: CommentSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAddComment = (newComment: Comment) => {
-    setComments((prevComments) => [newComment, ...prevComments]);
-  };
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetComments({ publicationId });
+
+  const { ref, inView } = useInView({ threshold: 1 });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const commentCount = data?.pages?.[0].totalItems;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="py-2 w-full">
@@ -46,7 +46,7 @@ export function CommentSection({
             />
           </Button>
           <p className="flex items-center gap-1 px-2 italic">
-            Внизу коментарі ({formatCount(commentCount)})
+            Внизу коментарі ({formatCount(commentCount || 0)})
           </p>
         </div>
       </CollapsibleTrigger>
@@ -61,25 +61,30 @@ export function CommentSection({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="space-y-3 overflow-hidden py-2"
             >
-              <CommentForm
-                publicationId={publicationId}
-                onCommentAdd={handleAddComment}
-              />
+              <CommentForm publicationId={publicationId} />
 
               <div className="w-full max-h-[70vh] overflow-y-auto">
-                {comments.length === 0 ? (
+                {commentCount === 0 ? (
                   <p className="py-2 text-center text-sm text-muted-foreground">
                     Ще ніхто не коментував, ви можете бути першими
                   </p>
                 ) : (
-                  comments.map((comment, index) => (
-                    <CommentItem
-                      key={comment.id}
-                      comment={comment}
-                      withDivider={index != comments.length - 1}
-                    />
-                  ))
+                  data?.pages.flatMap((page, i) =>
+                    page?.items.map((comment, j) => (
+                      <CommentItem
+                        key={comment.id}
+                        publicationId={publicationId}
+                        comment={comment}
+                        withDivider={!(i === 0 && j === 0)}
+                      />
+                    ))
+                  )
                 )}
+
+                {isFetchingNextPage && (
+                  <p className="text-center text-sm p-4">Завантаження...</p>
+                )}
+                {isOpen && <div ref={ref} className="h-0" />}
               </div>
             </motion.div>
           )}

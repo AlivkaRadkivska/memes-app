@@ -10,3 +10,17 @@ export interface Comment {
   };
   publication: string;
 }
+
+export interface CommentPayload {
+  publication: string;
+  text: string;
+  picture: File | null;
+}
+
+export interface CommentFilters {
+  publicationId?: string;
+  userId?: string;
+
+  limit?: number;
+  page?: number;
+}

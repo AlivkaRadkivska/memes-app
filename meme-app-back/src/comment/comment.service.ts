@@ -89,7 +89,9 @@ export class CommentService {
   async deleteOne(id: string, user: UserEntity): Promise<void> {
     const comment = await this.getOne(id, user.id);
 
-    await this.fileUploadService.deleteFiles([comment.picture]);
+    if (comment.picture)
+      await this.fileUploadService.deleteFiles([comment.picture]);
+
     await this.commentRepository.delete({ id: comment.id });
   }
 }

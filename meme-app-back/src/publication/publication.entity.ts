@@ -63,6 +63,7 @@ export class PublicationEntity {
 
   // Relations
 
+  @Exclude()
   @OneToMany(() => CommentEntity, (comment) => comment.publication)
   comments: CommentEntity[];
 

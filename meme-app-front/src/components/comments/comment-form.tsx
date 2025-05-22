@@ -1,70 +1,48 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/auth-context';
-import { Comment } from '@/server/types/comment';
+import useAddComment from '@/server/hooks/comments/use-add-comment';
 import { Paperclip, Send } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { v4 as uuid } from 'uuid';
 import PhotoCard from '../photos/photo-card';
 
 interface CommentFormProps {
   publicationId: string;
-  onCommentAdd: (comment: Comment) => void;
 }
 
-export function CommentForm({ publicationId, onCommentAdd }: CommentFormProps) {
+export function CommentForm({ publicationId }: CommentFormProps) {
   const { isAuthenticated } = useAuth();
+  const { addComment, isPending } = useAddComment({ publicationId });
 
   const [text, setText] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{
-    name: string;
+    file: File;
     preview: string;
   } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setSelectedImage({ name: file.name, preview });
-    }
+    if (file) setSelectedImage({ file, preview: URL.createObjectURL(file) });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!text.trim()) return;
-
-    setIsSubmitting(true);
-
-    const newComment: Comment = {
-      id: uuid(),
-      text: text.trim(),
-      picture: selectedImage?.preview || null,
+    addComment({
+      picture: selectedImage?.file || null,
       publication: publicationId,
-      createdAt: new Date(),
-      user: {
-        id: '',
-        username: '',
-        email: '',
-      },
-    };
-
-    onCommentAdd(newComment);
+      text,
+    });
 
     setText('');
     setSelectedImage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    setIsSubmitting(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-b py-3 flex gap-3">
+    <form onSubmit={handleSubmit} className="border-b py-3 px-1 flex gap-3">
       <Textarea
         placeholder="Ваша експертна думка про цю публікацію"
         value={text}
@@ -100,7 +78,7 @@ export function CommentForm({ publicationId, onCommentAdd }: CommentFormProps) {
         <Button
           type="submit"
           size="icon"
-          disabled={!text.trim() || isSubmitting || !isAuthenticated}
+          disabled={!text.trim() || isPending || !isAuthenticated}
           className="transition-all"
         >
           <Send />
