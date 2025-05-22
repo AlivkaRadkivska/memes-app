@@ -24,7 +24,7 @@ export default function usePublishMemes(
       toast('Публікується...');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.getPublications });
+      queryClient.invalidateQueries({ queryKey: queryKeys.getPublications() });
       toast('Опубліковано!');
     },
     onError: (err) => {

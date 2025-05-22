@@ -1,8 +1,8 @@
 'use client';
 import useGetPublications from '@/server/hooks/publications/use-get-publications';
+import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { PublicationCard } from './publication-card';
-import { useEffect } from 'react';
 
 export function PublicationsContainer() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -15,6 +15,8 @@ export function PublicationsContainer() {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  if (data?.pages[0].totalItems === 0) return <div>Нічого не має...</div>;
 
   return (
     <div>
