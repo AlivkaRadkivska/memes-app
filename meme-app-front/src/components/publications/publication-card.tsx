@@ -16,6 +16,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
+import { linkToBlob } from '@/helpers/file-utils';
 import { formatCount } from '@/helpers/publication-utils';
 import useLike from '@/server/hooks/publications/use-like';
 import useFollow from '@/server/hooks/users/use-follow';
@@ -31,7 +32,8 @@ import {
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 import { CommentSection } from '../comments/comment-section';
 import {
@@ -61,25 +63,67 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
 }) => {
   const [isDescCollapsed, setIsDescCollapsed] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [justLiked, setJustLiked] = useState(isLiked);
+  const [justFollowing, setJustFollowing] = useState(isFollowing);
+  const [justLiked, setJustLiked] = useState<{
+    isLiked: boolean;
+    likeCount: number;
+  }>({ isLiked, likeCount });
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { like, isPending: isPendingLike } = useLike();
   const { follow, isPending: isPendingFollow } = useFollow();
   const { unfollow, isPending: isPendingUnfollow } = useUnfollow();
 
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
   const handleLikeDebounced = useDebouncedCallback(() => {
-    setJustLiked((prev) => !prev);
-    like({ publicationId: id, isLiked: justLiked });
-  }, 500);
+    setJustLiked((prev) =>
+      prev.isLiked
+        ? { isLiked: false, likeCount: prev.likeCount - 1 }
+        : { isLiked: true, likeCount: prev.likeCount + 1 }
+    );
+    like({ publicationId: id, isLiked: justLiked.isLiked });
+  }, 300);
+
+  const handleFollow = () => {
+    setJustFollowing((prev) => !prev);
+    if (justFollowing) unfollow(author.id);
+    else follow(author.id);
+  };
+
+  const handleExport = async () => {
+    try {
+      pictures.forEach(async (picture, index) => {
+        const blobUrl = await linkToBlob(picture);
+
+        if (linkRef.current) {
+          linkRef.current.href = blobUrl;
+          linkRef.current.download = `${description.slice(0, 10)}_${index}.png`;
+          linkRef.current.click();
+
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 600);
+        }
+      });
+    } catch (err) {
+      toast('Щось пішло не так...');
+      console.error('Failed to fetch and download image:', err);
+    }
+  };
 
   useEffect(() => {
-    if (!isAuthenticated) setJustLiked(false);
+    if (!isAuthenticated) {
+      setJustLiked({ isLiked, likeCount });
+      setJustFollowing(isFollowing);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   return (
     <>
-      <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0">
+      <Card
+        className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0"
+        onDoubleClick={handleLikeDebounced}
+      >
         <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
           <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
             <Avatar className="w-16 h-16">
@@ -92,7 +136,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             <div className="flex flex-col gap-2 -mt-2">
               <div className="flex gap-2 items-center">
                 <p className="font-semibold text-xl">{author.username}</p>
-                {isFollowing && (
+                {justFollowing && (
                   <Button
                     variant="default"
                     className="[&_svg]:size-4 w-1 h-6"
@@ -115,19 +159,21 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               <PopoverContent className="w-min text-nowrap p-1" align="end">
                 <Button
                   variant="link"
-                  onClick={
-                    isFollowing
-                      ? () => unfollow(author.id)
-                      : () => follow(author.id)
-                  }
+                  onClick={handleFollow}
                   disabled={
-                    !isAuthenticated || isPendingFollow || isPendingUnfollow
+                    !isAuthenticated ||
+                    isPendingFollow ||
+                    isPendingUnfollow ||
+                    author.id === user?.id
                   }
                 >
-                  {isFollowing ? 'Відписатися' : 'Підписатися'}
+                  {justFollowing ? 'Відписатися' : 'Підписатися'}
                 </Button>
                 <Separator />
-                <Button variant="link">Скачати меми собі</Button>
+                <Button variant="link" onClick={handleExport}>
+                  Скачати меми собі
+                </Button>
+                <a ref={linkRef} className="hidden" />
               </PopoverContent>
             </Popover>
           </div>
@@ -201,12 +247,16 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               onClick={handleLikeDebounced}
               className={cn(
                 'flex items-center [&_svg]:size-6',
-                justLiked && 'text-red-500'
+                justLiked.isLiked && 'text-red-500'
               )}
               disabled={!isAuthenticated || isPendingLike}
             >
-              {justLiked ? <HeartHandshake size={24} /> : <Heart size={24} />}
-              {formatCount(justLiked ? likeCount + 1 : likeCount)}
+              {justLiked.isLiked ? (
+                <HeartHandshake size={24} />
+              ) : (
+                <Heart size={24} />
+              )}
+              {formatCount(justLiked.likeCount)}
             </Button>
           </div>
         </CardFooter>

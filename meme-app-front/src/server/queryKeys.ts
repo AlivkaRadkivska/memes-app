@@ -1,9 +1,8 @@
 import { CommentFilters } from './types/comment';
 import { PublicationFilters } from './types/publication';
 
-const getPublications = () => ['get-publications'];
-const getPublication = (filters?: Partial<PublicationFilters>) => [
-  'get-publication',
+const getPublications = (filters?: Partial<PublicationFilters>) => [
+  'get-publications',
   filters,
 ];
 const generateAiImage = () => ['generate-ai-image'];
@@ -14,7 +13,6 @@ const getComments = (filters?: Partial<CommentFilters>) => [
 
 export const queryKeys = {
   getPublications,
-  getPublication,
   generateAiImage,
   getComments,
 } as const;
