@@ -81,7 +81,8 @@ export class PublicationService {
     query.take(limit).skip(offset);
 
     const [publications, total] = await query.getManyAndCount();
-    const follows = await this.followService.getAllByFollower(user.id);
+    const follows =
+      user && (await this.followService.getAllByFollower(user.id));
 
     publications.forEach((publication) => {
       publication.setIsLiked(user);

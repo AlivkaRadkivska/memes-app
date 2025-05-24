@@ -20,7 +20,6 @@ import { linkToBlob } from '@/helpers/file-utils';
 import { formatCount } from '@/helpers/publication-utils';
 import useLike from '@/server/hooks/publications/use-like';
 import useFollow from '@/server/hooks/users/use-follow';
-import useUnfollow from '@/server/hooks/users/use-unfollow';
 import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -72,7 +71,6 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   const { isAuthenticated, user } = useAuth();
   const { like, isPending: isPendingLike } = useLike();
   const { follow, isPending: isPendingFollow } = useFollow();
-  const { unfollow, isPending: isPendingUnfollow } = useUnfollow();
 
   const linkRef = useRef<HTMLAnchorElement>(null);
 
@@ -87,8 +85,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
 
   const handleFollow = () => {
     setJustFollowing((prev) => !prev);
-    if (justFollowing) unfollow(author.id);
-    else follow(author.id);
+    follow({ publicationId: author.id, isFollowed: justFollowing });
   };
 
   const handleExport = async () => {
@@ -112,11 +109,10 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
 
   useEffect(() => {
     if (!isAuthenticated) {
-      setJustLiked({ isLiked, likeCount });
-      setJustFollowing(isFollowing);
+      setJustLiked({ isLiked: false, likeCount });
+      setJustFollowing(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
+  }, [isAuthenticated, likeCount]);
 
   return (
     <>
@@ -163,7 +159,6 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
                   disabled={
                     !isAuthenticated ||
                     isPendingFollow ||
-                    isPendingUnfollow ||
                     author.id === user?.id
                   }
                 >
@@ -210,7 +205,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
           <div
             className={cn(
-              'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[80%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
+              'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[90%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
               isDescCollapsed ? 'max-h-10' : 'max-h-[500%]'
             )}
             style={{
@@ -227,8 +222,13 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
                 )}
               />
             </Button>
-            <div className="flex flex-col gap-5">
-              <p className="mt-2">{description}</p>
+            <div
+              className={cn(
+                'flex flex-col gap-5 w-full',
+                !isDescCollapsed ? 'overflow-y-auto' : 'overflow-hidden'
+              )}
+            >
+              <p className="mt-2 text-wrap">{description}</p>
               <p className="mt-1 text-sm text-gray-500">
                 #{keywords.join(' #')}
               </p>

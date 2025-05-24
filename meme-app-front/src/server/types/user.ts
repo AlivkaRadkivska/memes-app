@@ -12,3 +12,10 @@ export interface User {
   followerCount: number;
   followingCount: number;
 }
+
+export interface FollowResponse {
+  id: string;
+  startFollowingAt: Date;
+  follower: { id: string; email: string };
+  following: { id: string };
+}

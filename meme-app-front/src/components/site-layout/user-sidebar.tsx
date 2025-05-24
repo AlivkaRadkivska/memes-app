@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { SidebarToggle } from '../ui/sidebar-toggle';
-import { MiniProfileSection } from '../users/mini-profile-section';
+import { MiniProfile } from '../users/mini-profile';
+import { MiniProfilePlaceholder } from '../users/mini-profile-placeholder';
 
 interface UserSidebarProps {
   className?: string;
@@ -34,7 +35,11 @@ export function UserSidebar({ className }: UserSidebarProps) {
 
       <div className="flex flex-col h-full cursor-pointer">
         <div className="pt-10">
-          <MiniProfileSection isCollapsed={isCollapsed} />
+          {isAuthenticated ? (
+            <MiniProfile isCollapsed={isCollapsed} />
+          ) : (
+            <MiniProfilePlaceholder isCollapsed={isCollapsed} />
+          )}
         </div>
 
         <div className="flex-1"></div>

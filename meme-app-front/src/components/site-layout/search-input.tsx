@@ -36,7 +36,7 @@ export function SearchInput() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Напишіть опис мему чи ім'я автора..."
+            placeholder="Опис мему чи ім'я автора"
             autoFocus
             className="w-full px-4 py-2 text-lg"
           />
@@ -48,7 +48,7 @@ export function SearchInput() {
         onClick={() => {
           setExpanded((prev) => !prev);
           if (!expanded) inputRef.current?.focus();
-          if (expanded) {
+          else {
             setQuery('');
             router.push('/');
           }

@@ -92,7 +92,7 @@ export default function PhotoCard({
           </div>
           {photo.name && (
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white">
-              <p className="text-sm truncate">{photo.name}</p>
+              <p className="text-sm truncate w-[80%]">{photo.name}</p>
             </div>
           )}
         </CardContent>
