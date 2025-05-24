@@ -89,8 +89,8 @@ export function CommentItem({
               </div>
               <p className="text-foreground/90 italic mt-3">{text}</p>
               {picture && (
-                <div className="mt-2 max-w-64 max-h-36 overflow-hidden rounded-md">
-                  <PhotoCard photo={{ preview: picture }} />
+                <div className="mt-2 max-w-64 overflow-hidden rounded-md">
+                  <PhotoCard photo={{ preview: picture }} height={36} />
                 </div>
               )}
             </div>

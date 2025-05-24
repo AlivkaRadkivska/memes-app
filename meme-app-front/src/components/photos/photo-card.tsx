@@ -1,6 +1,5 @@
-import { cn } from '@/helpers/css-utils';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, LoaderCircle, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Button } from '../ui/button';
@@ -11,6 +10,7 @@ import {
   DialogOverlay,
   DialogTitle,
 } from '../ui/dialog';
+import { Skeleton } from '../ui/skeleton';
 
 interface PhotoCardProps {
   photo: {
@@ -18,7 +18,8 @@ interface PhotoCardProps {
     name?: string;
     ai?: boolean;
   };
-  mini?: boolean;
+  width?: number;
+  height?: number;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -27,40 +28,44 @@ export default function PhotoCard({
   photo,
   onEdit,
   onDelete,
-  mini = false,
+  width = 52,
+  height = 64,
 }: PhotoCardProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <>
       <Card className="overflow-hidden group">
         <CardContent
-          className={cn(
-            'w-full p-0 relative aspect-square',
-            mini ? 'h-28' : 'h-64'
-          )}
+          className={`w-full p-0 relative aspect-square h-${height}`}
         >
-          <div
-            className={cn(
-              'relative w-full h-full',
-              mini ? 'min-h-14' : 'min-h-52'
+          <div className={`relative min-w-${width} h-${height}`}>
+            {isLoading && (
+              <Skeleton className="absolute top-0 right-0 inset-0 w-full h-full bg-background flex items-center justify-center z-10 animate-pulse">
+                <LoaderCircle className="w-24 h-24 animate-spin duration-1000" />
+              </Skeleton>
             )}
-          >
             <Image
               src={photo.preview}
               alt={photo.name || 'photo to preview'}
+              className="cursor-pointer"
               fill
+              loading="lazy"
+              onLoadStart={() => setIsLoading(true)}
+              onLoadingComplete={() => setIsLoading(false)}
+              onError={() => setIsLoading(false)}
               style={{
                 objectFit: 'cover',
                 minHeight: '100px',
               }}
-              className="cursor-pointer"
               onClick={() =>
                 setSelectedImage((prev) =>
                   photo.preview === prev ? null : photo.preview
                 )
               }
             />
+
             {photo.ai && (
               <p className="text-white absolute flex items-center bottom-1 right-1 px-1 rounded bg-red-700 bg-opacity-40">
                 AI
@@ -72,7 +77,7 @@ export default function PhotoCard({
                   size="icon"
                   variant="default"
                   onClick={onEdit}
-                  className="bg-white/70 flex items-center gap-1 absolute top-1 left-1 px-3 w-max "
+                  className="bg-white/70 text-black hover:bg-black/70 hover:text-white flex items-center gap-1 absolute top-1 left-1 px-3 w-max "
                 >
                   <Edit2 size={14} />
                   Редагувати

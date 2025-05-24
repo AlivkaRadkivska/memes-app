@@ -2,7 +2,6 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { ReactQueryProvider } from '@/providers/query-client';
 import { ThemeProvider } from '@/providers/theme-provider';
 import '@public/styles/globals.css';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
@@ -40,7 +39,7 @@ export default function RootLayout({
             <AuthProvider>
               <ReactQueryProvider>
                 {children}
-                <ReactQueryDevtools initialIsOpen={false} position="bottom" />
+                {/* <ReactQueryDevtools initialIsOpen={false} position="bottom" /> */}
               </ReactQueryProvider>
             </AuthProvider>
           </ThemeProvider>

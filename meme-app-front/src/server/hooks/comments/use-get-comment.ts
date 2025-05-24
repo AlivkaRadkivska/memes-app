@@ -6,7 +6,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 export default function useGetComments(
-  passingFilters?: Partial<CommentFilters>
+  passingFilters?: Partial<CommentFilters>,
+  options?: { enabled?: boolean }
 ) {
   const [filters, setFilters] = useState<Partial<CommentFilters>>({
     ...passingFilters,
@@ -22,6 +23,7 @@ export default function useGetComments(
         return res.items && res.totalPages > res.page ? res.page + 1 : null;
       },
       initialPageParam: 1,
+      ...options,
     });
 
   return {

@@ -16,13 +16,17 @@ import { CommentItem } from './comment-item';
 
 interface CommentSectionProps {
   publicationId: string;
+  commentCount: number;
 }
 
-export function CommentSection({ publicationId }: CommentSectionProps) {
+export function CommentSection({
+  publicationId,
+  commentCount,
+}: CommentSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetComments({ publicationId });
+    useGetComments({ publicationId }, { enabled: commentCount > 0 });
 
   const { ref, inView } = useInView({ threshold: 1 });
 
@@ -31,7 +35,6 @@ export function CommentSection({ publicationId }: CommentSectionProps) {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-  const commentCount = data?.pages?.[0].totalItems;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="py-2 w-full">

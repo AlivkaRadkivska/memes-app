@@ -56,6 +56,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     keywords,
     author,
     likeCount,
+    commentCount,
     isLiked,
     isFollowing,
   },
@@ -262,7 +263,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         </CardFooter>
       </Card>
 
-      <CommentSection publicationId={id} />
+      <CommentSection publicationId={id} commentCount={commentCount} />
 
       <Dialog
         open={!!selectedImage}
@@ -296,14 +297,14 @@ function ImageWithSkeleton({
   src: string;
   onClick: () => void;
 }) {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <div
       className="relative w-full h-full flex items-center justify-center"
       onClick={onClick}
     >
-      {loading && (
+      {isLoading && (
         <Skeleton className="absolute top-0 right-0 inset-0 w-full h-full bg-background flex items-center justify-center z-10 animate-none">
           <LoaderCircle className="w-36 h-36 animate-spin duration-1000" />
         </Skeleton>
@@ -315,8 +316,8 @@ function ImageWithSkeleton({
         layout="fill"
         objectFit="contain"
         loading="lazy"
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
+        onLoad={() => setIsLoading(false)}
+        onError={() => setIsLoading(false)}
         style={{ cursor: 'pointer' }}
       />
     </div>
