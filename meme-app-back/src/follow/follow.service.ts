@@ -20,6 +20,18 @@ export class FollowService {
     return await this.followRepository.find();
   }
 
+  async getAllByFollower(followerId: string): Promise<FollowEntity[]> {
+    return await this.followRepository.find({
+      where: { follower: { id: followerId } },
+    });
+  }
+
+  async getAllByFollowing(followingId: string): Promise<FollowEntity[]> {
+    return await this.followRepository.find({
+      where: { following: { id: followingId } },
+    });
+  }
+
   async createOne(
     followingId: string,
     follower: UserEntity,

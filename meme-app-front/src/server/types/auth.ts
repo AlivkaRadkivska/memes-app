@@ -24,10 +24,11 @@ export interface AuthResult {
 }
 
 export interface AuthContextType {
-  user: Partial<User> | null;
-  token: string | null;
+  user?: User;
+  token?: string;
   isAuthenticated: boolean;
   isLoading: boolean;
+  refetchUser: () => void;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
   setAuthFromRedirect: (token: string, user: string) => void;

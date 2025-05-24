@@ -1,20 +1,21 @@
 'use client';
 
+import { queryKeys } from '@/server/queryKeys';
 import {
   getCurrentUser,
   loginWithCredentials,
 } from '@/server/services/auth-service';
 import { AuthContextType, LoginCredentials } from '@/server/types/auth';
 import { User } from '@/server/types/user';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'universal-cookie';
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
-  token: null,
   isAuthenticated: false,
   isLoading: true,
+  refetchUser: () => {},
   login: async () => {},
   logout: () => {},
   setAuthFromRedirect: () => {},
@@ -23,33 +24,39 @@ const AuthContext = createContext<AuthContextType>({
 const cookies = new Cookies();
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const [token, setToken] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    data: currentUser,
+    isLoading: isCurrentUserLoading,
+    refetch,
+  } = useQuery<User | undefined>({
+    queryKey: queryKeys.getCurrentUser(),
+    queryFn: () => getCurrentUser(),
+    enabled: !!token,
+  });
 
   useEffect(() => {
-    (async () => {
-      const storedToken = localStorage.getItem('auth_token');
+    const storedToken = localStorage.getItem('auth_token');
 
-      if (storedToken) {
-        setToken(storedToken);
+    if (storedToken) setToken(storedToken);
+    else setIsLoading(false);
+  }, []);
 
-        try {
-          const currentUser = await getCurrentUser();
-          setUser(currentUser);
-        } catch (error) {
-          console.error('Token verification failed:', error);
-
-          localStorage.removeItem('auth_token');
-          setToken(null);
-          setUser(null);
-        }
+  useEffect(() => {
+    if (!isCurrentUserLoading) {
+      if (!currentUser && token) {
+        localStorage.removeItem('auth_token');
+        cookies.remove('auth_token', { path: '/' });
+        setToken(undefined);
       }
-
       setIsLoading(false);
-    })();
-  }, [token]);
+    }
+  }, [currentUser, isCurrentUserLoading, token]);
 
   const login = async (credentials: LoginCredentials) => {
     setIsLoading(true);
@@ -76,15 +83,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setIsLoading(true);
 
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      cookies.remove('auth_token', { path: '/' });
-      setToken(null);
-      setUser(null);
-    }
+    localStorage.removeItem('auth_token');
+    cookies.remove('auth_token', { path: '/' });
+    setToken(undefined);
+
+    queryClient.invalidateQueries({ queryKey: queryKeys.getCurrentUser() });
+    router.push('/auth');
 
     setIsLoading(false);
-    router.push('/auth');
   };
 
   const setAuthFromRedirect = (tokenStr: string) => {
@@ -103,10 +109,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const contextValue: AuthContextType = {
-    user,
+    user: currentUser,
     token,
-    isAuthenticated: !!token && !!user,
-    isLoading,
+    isAuthenticated: !!token && !!currentUser,
+    isLoading: isLoading || isCurrentUserLoading,
+    refetchUser: refetch,
     login,
     logout,
     setAuthFromRedirect,
@@ -119,8 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+
   return context;
 };

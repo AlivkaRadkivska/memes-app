@@ -1,3 +1,5 @@
+import { Comment } from './comment';
+
 export interface Author {
   id: string;
   username: string;
@@ -20,6 +22,9 @@ export interface Publication {
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
+  isFollowing: boolean;
+
+  comments: Comment[];
 }
 
 export interface PublishMemesPayload {

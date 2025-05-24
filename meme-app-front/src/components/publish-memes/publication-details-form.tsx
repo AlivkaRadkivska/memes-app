@@ -127,7 +127,7 @@ export function PublicationDetailsForm({
                   <BadgeInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Тицьніть Enter, Space або кому, щоб додати..."
+                    placeholder="Тицьніть enter, пробіл або кому, щоб додати слово"
                     error={!!form.formState.errors.keywords}
                     disabled={isDisabled}
                   />

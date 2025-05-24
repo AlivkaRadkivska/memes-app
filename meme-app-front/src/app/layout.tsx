@@ -37,7 +37,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AuthProvider>
-              <ReactQueryProvider>{children}</ReactQueryProvider>
+              <ReactQueryProvider>
+                {children}
+                {/* <ReactQueryDevtools initialIsOpen={false} position="bottom" /> */}
+              </ReactQueryProvider>
             </AuthProvider>
           </ThemeProvider>
         </ReactQueryProvider>
