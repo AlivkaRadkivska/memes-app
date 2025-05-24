@@ -31,6 +31,7 @@ export class PublicationEntity {
   @Transform(({ value }) => {
     return {
       id: value.id,
+      avatar: value.avatar,
       username: value.username,
       fullName: value.fullName,
       email: value.email,

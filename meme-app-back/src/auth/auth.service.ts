@@ -63,6 +63,7 @@ export class AuthService {
 
   async signUp(
     signUpCredentialsDto: SignUpCredentialsDto,
+    picture?: Express.Multer.File,
   ): Promise<AuthResultDto> {
     const { password, repeatPassword } = signUpCredentialsDto;
 
@@ -71,11 +72,14 @@ export class AuthService {
 
     const hashedPassword = await this.getHashedPassword(password);
 
-    const user = await this.userService.createOne({
-      ...signUpCredentialsDto,
-      password: hashedPassword,
-      role: 'user',
-    });
+    const user = await this.userService.createOne(
+      {
+        ...signUpCredentialsDto,
+        password: hashedPassword,
+        role: 'user',
+      },
+      picture,
+    );
 
     return {
       user: {

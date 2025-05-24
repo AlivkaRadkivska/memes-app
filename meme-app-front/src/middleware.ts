@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const protectedPaths = ['/admin', '/profile', '/gallery'];
 const authPaths = ['/', '/login', '/signup'];

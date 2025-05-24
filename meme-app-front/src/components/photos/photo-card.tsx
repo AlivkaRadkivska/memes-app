@@ -36,7 +36,7 @@ export default function PhotoCard({
 
   return (
     <>
-      <Card className="overflow-hidden group">
+      <Card className={`overflow-hidden group w-full max-w-${width}`}>
         <CardContent
           className={`w-full p-0 relative aspect-square h-${height}`}
         >

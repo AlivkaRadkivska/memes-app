@@ -124,11 +124,8 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
           <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
             <Avatar className="w-16 h-16">
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                alt={author.email}
-              />
-              <AvatarFallback>{author.username}</AvatarFallback>
+              <AvatarImage src={author.avatar} alt={author.username} />
+              <AvatarFallback>Ніц</AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-2 -mt-2">
               <div className="flex gap-2 items-center">

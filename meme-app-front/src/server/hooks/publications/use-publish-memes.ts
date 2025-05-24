@@ -8,6 +8,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function usePublishMemes(
@@ -18,6 +19,7 @@ export default function usePublishMemes(
   >
 ) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { mutate: publish, isPending } = useMutation({
     mutationFn: (data) => publishMemes(data),
     onMutate: () => {
@@ -26,6 +28,7 @@ export default function usePublishMemes(
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.getPublications() });
       toast('Опубліковано!');
+      router.push('/');
     },
     onError: (err) => {
       console.error('API Error:', err);

@@ -1,10 +1,10 @@
 'use client';
+import { useAuth } from '@/contexts/auth-context';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { SearchInput } from './search-input';
 import { ThemeToggle } from './theme-toggle';
-import { useAuth } from '@/contexts/auth-context';
 
 export function Header() {
   const { isAuthenticated } = useAuth();

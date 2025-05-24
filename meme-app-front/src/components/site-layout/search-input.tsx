@@ -14,14 +14,9 @@ export function SearchInput() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (debouncedQuery.trim()) {
-      router.push(
-        `/?search=${encodeURIComponent(debouncedQuery.trim())}&&page=1`
-      );
-    } else {
-      router.push('/');
-    }
-  }, [debouncedQuery, router]);
+    if (expanded)
+      router.push(`/?search=${encodeURIComponent(debouncedQuery.trim())}`);
+  }, [debouncedQuery, expanded, router]);
 
   return (
     <div className="relative flex items-center gap-2 w-full">

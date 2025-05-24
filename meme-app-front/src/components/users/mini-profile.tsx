@@ -22,12 +22,9 @@ export function MiniProfile({ isCollapsed }: { isCollapsed: boolean }) {
         )}
         onClick={() => router.push('/profile')}
       >
-        <AvatarImage
-          src={'https://github.com/shadcn.png'}
-          alt={user?.username}
-        />
+        <AvatarImage src={user?.avatar} alt={user?.username} />
         <AvatarFallback className="bg-primary/10 text-primary">
-          {user?.username}
+          Ніц
         </AvatarFallback>
       </Avatar>
 

@@ -12,6 +12,7 @@ export interface SignupCredentials {
   repeatPassword: string;
   fullName?: string;
   birthday?: Date;
+  avatar?: File;
 }
 
 export interface AuthResult {

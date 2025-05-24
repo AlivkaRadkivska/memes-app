@@ -13,7 +13,7 @@ export const signupFormSchema = z
       .max(30, 'Повне ім’я задовге')
       .optional()
       .or(z.literal('')),
-
+    avatar: z.instanceof(File).optional(),
     birthday: z
       .union([
         z.date().refine((date) => isValid(date) && isDate(date), {

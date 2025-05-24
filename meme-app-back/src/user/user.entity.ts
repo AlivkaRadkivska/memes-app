@@ -24,6 +24,9 @@ export class UserEntity {
   @Column()
   username: string;
 
+  @Column({ nullable: true })
+  avatar?: string;
+
   @Exclude({ toPlainOnly: true })
   @Column({ nullable: true })
   password?: string;

@@ -13,7 +13,7 @@ export const commentPublication = async (
   data: CommentPayload
 ): Promise<void> => {
   const formData = new FormData();
-  if (data.picture != null)
+  if (!!data.picture)
     formData.append('picture', data.picture, data.picture.name);
   formData.append('publication', data.publication);
   formData.append('text', data.text);

@@ -70,7 +70,7 @@ export default function PublishMemes() {
               <Button
                 variant="outline"
                 onClick={!isLimitReached ? handleUpload : undefined}
-                disabled={isLimitReached}
+                disabled={isLimitReached || isPublishing}
               >
                 <ImagePlus className="w-8 h-8" />
                 Завантажити своє
@@ -83,6 +83,7 @@ export default function PublishMemes() {
                       ? form.handleSubmit(onSubmit)
                       : undefined
                   }
+                  disabled={isPublishing}
                 >
                   Опублікувати
                 </Button>

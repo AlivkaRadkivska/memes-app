@@ -72,7 +72,7 @@ export class PublicationService {
         'publication.createdAt',
         filters.createdAtDesc ? 'DESC' : 'ASC',
       );
-    }
+    } else query.orderBy('publication.createdAt', 'DESC');
 
     const limit = Number(filters?.limit) || 3;
     const page = Number(filters?.page) || 1;

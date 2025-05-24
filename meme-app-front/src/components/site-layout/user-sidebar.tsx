@@ -16,7 +16,7 @@ interface UserSidebarProps {
 }
 
 export function UserSidebar({ className }: UserSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
 

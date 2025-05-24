@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
+import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
@@ -16,6 +17,7 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private fileUploadService: FileUploadService,
   ) {}
 
   async getAll(
@@ -81,9 +83,18 @@ export class UserService {
     return user;
   }
 
-  async createOne(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async createOne(
+    createUserDto: CreateUserDto,
+    picture?: Express.Multer.File,
+  ): Promise<UserEntity> {
     try {
       const user = this.userRepository.create(createUserDto);
+
+      if (picture) {
+        const pictureUrl = await this.fileUploadService.uploadFiles([picture]);
+        user.avatar = pictureUrl[0];
+      }
+
       await this.userRepository.save(user);
 
       return user;
