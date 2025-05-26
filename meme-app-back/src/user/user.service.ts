@@ -78,7 +78,7 @@ export class UserService {
       relations: ['followers', 'followings'],
       where: [{ id }, { email }],
     });
-    if (!user) throw new NotFoundException('Користувача не знайдено');
+    if (!user) throw new NotFoundException(['Користувача не знайдено']);
 
     return user;
   }
@@ -111,6 +111,7 @@ export class UserService {
   async deleteOne(id: string): Promise<void> {
     const res = await this.userRepository.delete({ id });
 
-    if (res.affected === 0) throw new NotFoundException();
+    if (res.affected === 0)
+      throw new NotFoundException(['Користувача не знайдено']);
   }
 }

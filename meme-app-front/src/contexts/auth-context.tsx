@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'universal-cookie';
 
+const cookies = new Cookies();
+
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: true,
@@ -20,8 +22,6 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   setAuthFromRedirect: () => {},
 });
-
-const cookies = new Cookies();
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -41,16 +41,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('auth_token');
+    const storedToken = cookies.get('auth_token');
 
     if (storedToken) setToken(storedToken);
     else setIsLoading(false);
   }, []);
 
   useEffect(() => {
+    if (!isLoading && currentUser && token) router.push('/');
+  }, [isLoading, currentUser, token, router]);
+
+  useEffect(() => {
     if (!isCurrentUserLoading) {
       if (!currentUser && token) {
-        localStorage.removeItem('auth_token');
         cookies.remove('auth_token', { path: '/' });
         setToken(undefined);
       }
@@ -62,16 +65,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       const result = await loginWithCredentials(credentials);
-      setToken(result.accessToken);
 
-      localStorage.setItem('auth_token', result.accessToken);
+      setToken(result.accessToken);
       cookies.set('auth_token', result.accessToken, {
         path: '/',
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       });
-
-      router.push('/');
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -83,7 +83,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setIsLoading(true);
 
-    localStorage.removeItem('auth_token');
     cookies.remove('auth_token', { path: '/' });
     setToken(undefined);
 
@@ -96,8 +95,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const setAuthFromRedirect = (tokenStr: string) => {
     try {
       setToken(tokenStr);
-
-      localStorage.setItem('auth_token', tokenStr);
       cookies.set('auth_token', tokenStr, {
         path: '/',
         sameSite: 'lax',
