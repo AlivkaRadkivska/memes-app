@@ -4,6 +4,7 @@ export class PublicationFiltersDto {
   isBanned?: boolean;
   search?: string;
   author?: string;
+  authorId?: string;
   createdAtDesc?: boolean;
 
   limit?: number;

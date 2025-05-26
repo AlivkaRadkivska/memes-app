@@ -61,7 +61,7 @@ export class CommentService {
       ],
     });
 
-    if (!comment) throw new NotFoundException('Comment not found');
+    if (!comment) throw new NotFoundException(['Comment not found']);
 
     return comment;
   }

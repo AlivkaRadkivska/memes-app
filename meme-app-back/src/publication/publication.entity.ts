@@ -51,7 +51,7 @@ export class PublicationEntity {
   lastUpdatedAt: Date;
 
   @Column()
-  @IsIn(['active', 'hidden', 'draft'])
+  @IsIn(['active', 'hidden'])
   status: string;
 
   @Column({ name: 'is_banned', default: false })

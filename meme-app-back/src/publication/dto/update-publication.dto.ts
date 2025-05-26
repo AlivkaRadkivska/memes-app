@@ -10,6 +10,6 @@ export class UpdatePublicationDto {
   keywords: string[];
 
   @IsOptional()
-  @IsIn(['active', 'hidden', 'draft'])
+  @IsIn(['active', 'hidden'])
   status: string;
 }

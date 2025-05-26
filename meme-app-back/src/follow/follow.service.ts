@@ -37,7 +37,7 @@ export class FollowService {
     follower: UserEntity,
   ): Promise<FollowEntity> {
     if (followingId === follower.id)
-      throw new BadRequestException('You can not follow yourself');
+      throw new BadRequestException(['You can not follow yourself']);
 
     try {
       const follow = this.followRepository.create({

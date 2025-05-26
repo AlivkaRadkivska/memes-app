@@ -67,6 +67,12 @@ export class PublicationService {
       );
     }
 
+    if (filters?.authorId) {
+      query.andWhere('author.id IS :authorId', {
+        authorId: `%${filters.authorId}%`,
+      });
+    }
+
     if (filters?.createdAtDesc !== undefined) {
       query.orderBy(
         'publication.createdAt',
@@ -104,7 +110,8 @@ export class PublicationService {
       where: { id, author: { id: authorId } },
     });
 
-    if (!publication) throw new NotFoundException('Publication was not found');
+    if (!publication)
+      throw new NotFoundException(['Publication was not found']);
 
     return publication;
   }
