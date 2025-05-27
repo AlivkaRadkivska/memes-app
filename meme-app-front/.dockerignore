@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+
+# IDE files
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Environment variables
+.env*
+
+# Next.js build output
+.next
+
+# Docker files
+Dockerfile*
+docker-compose*
+
+README.md
