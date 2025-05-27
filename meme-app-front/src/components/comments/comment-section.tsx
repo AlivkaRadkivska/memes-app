@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/collapsible';
 import { cn } from '@/helpers/css-utils';
 import { formatCount } from '@/helpers/publication-utils';
-import useGetComments from '@/server/hooks/comments/use-get-comment';
+import useGetComments from '@/server/hooks/comments/use-get-comments';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
 import { useEffect, useState } from 'react';

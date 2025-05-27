@@ -1,5 +1,5 @@
 import axiosInstance from '../axios';
-import { FollowResponse } from '../types/user';
+import { FollowResponse, User } from '../types/user';
 
 export const startFollow = async (
   followingId: string
@@ -10,5 +10,10 @@ export const startFollow = async (
 
 export const stopFollow = async (followingId: string): Promise<void> => {
   const response = await axiosInstance.delete(`/follow/${followingId}`);
+  return response.data;
+};
+
+export const getUserByEmail = async (email: string): Promise<User> => {
+  const response = await axiosInstance.get(`/user/email/${email}`);
   return response.data;
 };

@@ -1,21 +1,21 @@
 'use client';
 
-import { useAuth } from '@/contexts/auth-context';
+import useGetUser from '@/server/hooks/users/use-get-user';
 import { notFound } from 'next/navigation';
 import { ProfileHeader } from './profile-header';
 import { PublicationGrid } from './profile-publications';
 
-export default function Profile() {
-  const { user, isLoading } = useAuth();
+export default function Profile({ email }: { email: string }) {
+  const { user, isInitialFetching } = useGetUser(email);
 
-  if (isLoading) return <p>Loading</p>;
+  if (isInitialFetching) return <p>Loading</p>;
 
   if (!user) return notFound();
 
   return (
     <div className="flex-1 flex flex-col">
-      <ProfileHeader user={user} me />
-      <PublicationGrid userId={user.id} me />
+      <ProfileHeader user={user} />
+      <PublicationGrid userId={user.id} />
     </div>
   );
 }

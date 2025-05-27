@@ -26,6 +26,7 @@ import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   EllipsisVertical,
+  EyeOff,
   Heart,
   HeartHandshake,
   LoaderCircle,
@@ -33,6 +34,7 @@ import {
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
@@ -78,6 +80,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const { deletePublication, isPending: isPendingDelete } =
     useDeletePublication();
@@ -95,7 +98,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   );
 
   const handleFollow = () => {
-    follow({ publicationId: author.id, isFollowed: isFollowing });
+    follow({ followingId: author.id, isFollowed: isFollowing });
   };
 
   const handleExport = async () => {
@@ -127,29 +130,29 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
   return (
     <div className="w-full h-full">
       <Card
-        className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0"
+        className={cn(
+          'flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0',
+          status === 'hidden' && 'brightness-75 dark:brightness-50'
+        )}
         onDoubleClick={handleLikeDebounced}
       >
         <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
-          <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
+          <div
+            className="flex gap-2 items-start py-1 px-3 rounded-br-md cursor-pointer"
+            onClick={() => router.push(`/profile/${author.email}`)}
+          >
             <Avatar className="w-16 h-16">
               <AvatarImage src={author.avatar} alt={author.username} />
               <AvatarFallback>Ніц</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col gap-2 -mt-2">
+            <div className="flex flex-col gap-2">
               <div className="flex gap-2 items-center">
-                <p className="font-semibold text-xl">{author.username}</p>
-                {isFollowing && (
-                  <Button
-                    variant="default"
-                    className="[&_svg]:size-4 w-1 h-6"
-                    disabled
-                  >
-                    <PawPrint />
-                  </Button>
-                )}
+                <p className="font-semibold flex text-xl -mt-1">
+                  {author.username}
+                  {isFollowing && <PawPrint size={20} className="ml-1 -mt-1" />}
+                </p>
               </div>
-              <p className="text-sm -mt-1">{author.email}</p>
+              <p className="text-sm -mt-3">{author.email}</p>
             </div>
           </div>
           <div className="flex items-center">
@@ -202,7 +205,14 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
           </div>
         </CardHeader>
 
-        <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
+        <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8 relative">
+          {status === 'hidden' && (
+            <EyeOff
+              size={80}
+              color="white"
+              className="bg-black/40 p-4 rounded-2xl absolute left-[50%] top-[50%] z-40 -ml-[40px] -mt-[40px]"
+            />
+          )}
           <Carousel className="w-full h-full">
             <CarouselContent className="w-full h-full">
               {pictures.map((picture) => (

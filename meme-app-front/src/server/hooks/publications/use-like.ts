@@ -22,8 +22,6 @@ export default function useLike(
   const { filters } = usePublicationFilters();
   const queryClient = useQueryClient();
 
-  console.log(filters);
-
   const { mutate: like, isPending } = useMutation({
     mutationFn: (data) =>
       data.isLiked

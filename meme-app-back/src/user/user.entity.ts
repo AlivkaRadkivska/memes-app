@@ -82,10 +82,31 @@ export class UserEntity {
   @IsInt()
   publicationCount: number;
 
+  isFollowing: boolean;
+
   @AfterLoad()
   getCounts(): void {
     this.followerCount = this.followers ? this.followers.length : 0;
     this.followingCount = this.followings ? this.followings.length : 0;
-    this.publicationCount = this.publications ? this.publications.length : 0;
+
+    if (this.publications) {
+      const activePublications = this.publications.filter(
+        (publication) => publication.status === 'active',
+      );
+      this.publicationCount = activePublications.length;
+    } else {
+      this.publicationCount = 0;
+    }
+  }
+
+  setIsFollowing(user?: Partial<UserEntity>, follows?: FollowEntity[]): void {
+    if (!user || !follows) {
+      this.isFollowing = false;
+      return;
+    }
+
+    this.isFollowing = follows.some(
+      (follow) => follow.following?.id === this.id,
+    );
   }
 }

@@ -13,6 +13,7 @@ export interface User {
   followerCount: number;
   followingCount: number;
   publicationCount: number;
+  isFollowing: boolean;
 }
 
 export interface FollowResponse {

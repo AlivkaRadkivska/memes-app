@@ -32,7 +32,7 @@ export default function useGetPublications(
 
   return {
     data,
-    isFetching,
+    isInitialFetching: isFetching && !isFetchingNextPage,
     hasNextPage,
     isFetchingNextPage,
     filters,

@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { FollowService } from 'src/follow/follow.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
@@ -17,10 +18,12 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private followService: FollowService,
     private fileUploadService: FileUploadService,
   ) {}
 
   async getAll(
+    authUser?: UserEntity,
     filters?: UserFiltersDto,
   ): Promise<PaginatedDataDto<UserEntity>> {
     const query = this.userRepository
@@ -64,6 +67,11 @@ export class UserService {
     query.take(limit).skip(offset);
 
     const [users, total] = await query.getManyAndCount();
+    const follows =
+      authUser && (await this.followService.getAllByFollower(authUser.id));
+    users.forEach(async (user) => {
+      user.setIsFollowing(authUser, follows);
+    });
 
     return {
       items: users,
@@ -74,11 +82,19 @@ export class UserService {
     };
   }
 
-  async getOne(id?: string, email?: string): Promise<UserEntity> {
+  async getOne(
+    params: { id?: string; email?: string },
+    authUser?: UserEntity,
+  ): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       relations: ['followers', 'followings', 'publications'],
-      where: [{ id }, { email }],
+      where: params,
     });
+
+    const follows =
+      authUser && (await this.followService.getAllByFollower(authUser.id));
+    user.setIsFollowing(authUser, follows);
+
     if (!user) throw new NotFoundException(['Користувача не знайдено']);
 
     return user;

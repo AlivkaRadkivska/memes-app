@@ -98,7 +98,7 @@ export function PublicationLocalFilters({
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-sm text-muted-foreground">Задані фільтри:</span>
 
-          {currentFilters.status && (
+          {currentFilters.status && me && (
             <Badge variant="secondary" className="gap-1 pl-2">
               Статус: {currentFilters.status}
               <X
