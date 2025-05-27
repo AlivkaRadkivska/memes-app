@@ -58,3 +58,24 @@ export const dislikePublication = async (
   const response = await axiosInstance.delete(`/like/${publicationId}`);
   return response.data;
 };
+
+export const hidePublication = async (publicationId: string): Promise<void> => {
+  const response = await axiosInstance.patch(`/publication/${publicationId}`, {
+    status: 'hidden',
+  });
+  return response.data;
+};
+
+export const showPublication = async (publicationId: string): Promise<void> => {
+  const response = await axiosInstance.patch(`/publication/${publicationId}`, {
+    status: 'active',
+  });
+  return response.data;
+};
+
+export const deleteOnePublication = async (
+  publicationId: string
+): Promise<void> => {
+  const response = await axiosInstance.delete(`/publication/${publicationId}`);
+  return response.data;
+};

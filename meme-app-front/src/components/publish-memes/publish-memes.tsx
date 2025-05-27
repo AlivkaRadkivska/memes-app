@@ -85,7 +85,7 @@ export default function PublishMemes() {
                   }
                   disabled={isPublishing}
                 >
-                  Опублікувати
+                  Додати собі меми
                 </Button>
               )}
             </div>

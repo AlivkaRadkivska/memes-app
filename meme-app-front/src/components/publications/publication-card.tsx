@@ -17,8 +17,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
 import { linkToBlob } from '@/helpers/file-utils';
-import { formatCount } from '@/helpers/publication-utils';
+import { formatCount, formatDate } from '@/helpers/publication-utils';
+import useDeletePublication from '@/server/hooks/publications/use-delete';
 import useLike from '@/server/hooks/publications/use-like';
+import useTogglePublicationStatus from '@/server/hooks/publications/use-toggle-status';
 import useFollow from '@/server/hooks/users/use-follow';
 import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -31,10 +33,19 @@ import {
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 import { CommentSection } from '../comments/comment-section';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
@@ -59,34 +70,32 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     commentCount,
     isLiked,
     isFollowing,
+    createdAt,
+    status,
   },
 }) => {
   const [isDescCollapsed, setIsDescCollapsed] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [justFollowing, setJustFollowing] = useState(isFollowing);
-  const [justLiked, setJustLiked] = useState<{
-    isLiked: boolean;
-    likeCount: number;
-  }>({ isLiked, likeCount });
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { isAuthenticated, user } = useAuth();
+  const { deletePublication, isPending: isPendingDelete } =
+    useDeletePublication();
   const { like, isPending: isPendingLike } = useLike();
   const { follow, isPending: isPendingFollow } = useFollow();
+  const { togglePublicationStatus, isPending: isPendingStatus } =
+    useTogglePublicationStatus();
 
   const linkRef = useRef<HTMLAnchorElement>(null);
+  const isMine = user?.id === author.id;
 
-  const handleLikeDebounced = useDebouncedCallback(() => {
-    setJustLiked((prev) =>
-      prev.isLiked
-        ? { isLiked: false, likeCount: prev.likeCount - 1 }
-        : { isLiked: true, likeCount: prev.likeCount + 1 }
-    );
-    like({ publicationId: id, isLiked: justLiked.isLiked });
-  }, 300);
+  const handleLikeDebounced = useDebouncedCallback(
+    () => like({ publicationId: id, isLiked }),
+    300
+  );
 
   const handleFollow = () => {
-    setJustFollowing((prev) => !prev);
-    follow({ publicationId: author.id, isFollowed: justFollowing });
+    follow({ publicationId: author.id, isFollowed: isFollowing });
   };
 
   const handleExport = async () => {
@@ -108,15 +117,15 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setJustLiked({ isLiked: false, likeCount });
-      setJustFollowing(false);
+  const handleDelete = () => {
+    if (confirmDelete) {
+      deletePublication(id);
+      setConfirmDelete(false);
     }
-  }, [isAuthenticated, likeCount]);
+  };
 
   return (
-    <>
+    <div className="w-full h-full">
       <Card
         className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0"
         onDoubleClick={handleLikeDebounced}
@@ -130,7 +139,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             <div className="flex flex-col gap-2 -mt-2">
               <div className="flex gap-2 items-center">
                 <p className="font-semibold text-xl">{author.username}</p>
-                {justFollowing && (
+                {isFollowing && (
                   <Button
                     variant="default"
                     className="[&_svg]:size-4 w-1 h-6"
@@ -144,29 +153,50 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             </div>
           </div>
           <div className="flex items-center">
+            <p className="text-sm -mt-1">{formatDate(createdAt)}</p>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="w-6">
                   <EllipsisVertical size={16} />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-min text-nowrap p-1" align="end">
+              <PopoverContent
+                className="w-min text-nowrap p-1 flex flex-col items-start"
+                align="end"
+              >
                 <Button
                   variant="link"
                   onClick={handleFollow}
-                  disabled={
-                    !isAuthenticated ||
-                    isPendingFollow ||
-                    author.id === user?.id
-                  }
+                  disabled={!isAuthenticated || isPendingFollow || isMine}
                 >
-                  {justFollowing ? 'Відписатися' : 'Підписатися'}
+                  {isFollowing ? 'Відписатися' : 'Підписатися'}
                 </Button>
                 <Separator />
                 <Button variant="link" onClick={handleExport}>
                   Скачати меми собі
                 </Button>
                 <a ref={linkRef} className="hidden" />
+                {isMine && (
+                  <>
+                    <Separator />
+                    <Button
+                      variant="link"
+                      disabled={isPendingStatus}
+                      onClick={() =>
+                        togglePublicationStatus({ publicationId: id, status })
+                      }
+                    >
+                      {status === 'active' ? 'Сховати' : 'Опублікувати'}
+                    </Button>
+                    <Button
+                      variant="link"
+                      disabled={isPendingDelete}
+                      onClick={() => setConfirmDelete(true)}
+                    >
+                      Видалити
+                    </Button>
+                  </>
+                )}
               </PopoverContent>
             </Popover>
           </div>
@@ -245,16 +275,12 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               onClick={handleLikeDebounced}
               className={cn(
                 'flex items-center [&_svg]:size-6',
-                justLiked.isLiked && 'text-red-500'
+                isLiked && 'text-red-500'
               )}
               disabled={!isAuthenticated || isPendingLike}
             >
-              {justLiked.isLiked ? (
-                <HeartHandshake size={24} />
-              ) : (
-                <Heart size={24} />
-              )}
-              {formatCount(justLiked.likeCount)}
+              {isLiked ? <HeartHandshake size={24} /> : <Heart size={24} />}
+              {formatCount(likeCount)}
             </Button>
           </div>
         </CardFooter>
@@ -283,7 +309,24 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
           )}
         </DialogContent>
       </Dialog>
-    </>
+
+      <AlertDialog open={confirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Точно видалити?</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ні</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
+              Так
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };
 

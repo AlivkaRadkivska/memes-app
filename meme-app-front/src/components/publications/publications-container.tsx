@@ -8,7 +8,7 @@ import { LoaderCircle } from 'lucide-react';
 
 export function PublicationsContainer() {
   const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
-    useGetPublications();
+    useGetPublications({ limit: 3, status: 'active' });
 
   const { ref, inView } = useInView({ threshold: 1 });
 

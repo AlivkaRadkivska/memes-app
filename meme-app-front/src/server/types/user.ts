@@ -12,6 +12,7 @@ export interface User {
   banExpiresAt?: Date;
   followerCount: number;
   followingCount: number;
+  publicationCount: number;
 }
 
 export interface FollowResponse {

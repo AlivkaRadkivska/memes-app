@@ -1,15 +1,12 @@
 'use client';
 
 import { queryKeys } from '@/server/queryKeys';
-import {
-  getCurrentUser,
-  loginWithCredentials,
-} from '@/server/services/auth-service';
-import { AuthContextType, LoginCredentials } from '@/server/types/auth';
+import { getCurrentUser } from '@/server/services/auth-service';
+import { AuthContextType } from '@/server/types/auth';
 import { User } from '@/server/types/user';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
@@ -18,7 +15,6 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: true,
   refetchUser: () => {},
-  login: async () => {},
   logout: () => {},
   setAuthFromRedirect: () => {},
 });
@@ -48,10 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && currentUser && token) router.push('/');
-  }, [isLoading, currentUser, token, router]);
-
-  useEffect(() => {
     if (!isCurrentUserLoading) {
       if (!currentUser && token) {
         cookies.remove('auth_token', { path: '/' });
@@ -60,25 +52,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }
   }, [currentUser, isCurrentUserLoading, token]);
-
-  const login = async (credentials: LoginCredentials) => {
-    setIsLoading(true);
-    try {
-      const result = await loginWithCredentials(credentials);
-
-      setToken(result.accessToken);
-      cookies.set('auth_token', result.accessToken, {
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const logout = async () => {
     setIsLoading(true);
@@ -105,16 +78,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const contextValue: AuthContextType = {
-    user: currentUser,
-    token,
-    isAuthenticated: !!token && !!currentUser,
-    isLoading: isLoading || isCurrentUserLoading,
-    refetchUser: refetch,
-    login,
-    logout,
-    setAuthFromRedirect,
-  };
+  const contextValue: AuthContextType = useMemo(
+    () => ({
+      user: currentUser,
+      token,
+      isAuthenticated: !!token && !!currentUser,
+      isLoading: isLoading || isCurrentUserLoading,
+      refetchUser: refetch,
+      logout,
+      setAuthFromRedirect,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser, isCurrentUserLoading, isLoading, token]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

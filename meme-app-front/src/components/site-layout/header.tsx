@@ -7,7 +7,7 @@ import { SearchInput } from './search-input';
 import { ThemeToggle } from './theme-toggle';
 
 export function Header() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -29,8 +29,8 @@ export function Header() {
       return <p className="text-center h-full text-xl">Авторизація</p>;
     }
 
-    if (pathname.startsWith('/profile')) {
-      return <p className="text-center">Профіль</p>;
+    if (pathname.startsWith('/my-profile')) {
+      return <p className="text-center h-full text-xl">{user?.username}</p>;
     }
 
     return null;

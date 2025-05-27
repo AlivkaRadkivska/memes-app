@@ -14,7 +14,7 @@ export interface Publication {
   author: Author;
   createdAt: Date;
   lastUpdatedAt: Date;
-  status: string;
+  status: 'active' | 'hidden';
   isBanned: boolean;
   banReason?: string;
   banExpiresAt?: Date;
@@ -33,10 +33,10 @@ export interface PublishMemesPayload {
 
 export interface PublicationFilters {
   keywords?: string;
-  status?: string;
-  isBanned?: boolean;
+  status?: 'active' | 'hidden';
   search?: string;
   author?: string;
+  authorId?: string;
   createdAtDesc?: boolean;
 
   limit?: number;

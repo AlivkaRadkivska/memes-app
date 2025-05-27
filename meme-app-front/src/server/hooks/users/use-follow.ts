@@ -1,10 +1,16 @@
 import { useAuth } from '@/contexts/auth-context';
+import { queryKeys } from '@/server/queryKeys';
 import { startFollow, stopFollow } from '@/server/services/user-service';
 import { CommonError } from '@/server/types/common';
 import { FollowResponse } from '@/server/types/user';
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import {
+  useMutation,
+  UseMutationOptions,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
+import { usePublicationFilters } from '../publications/use-publication-filters';
 
 export default function useFollow(
   options?: UseMutationOptions<
@@ -14,6 +20,8 @@ export default function useFollow(
   >
 ) {
   const { refetchUser } = useAuth();
+  const queryClient = useQueryClient();
+  const { filters } = usePublicationFilters();
 
   const { mutate: follow, isPending } = useMutation({
     mutationFn: (data) =>
@@ -24,6 +32,9 @@ export default function useFollow(
       if (response?.id) toast('Тепер ви слідкуєте за цією людиною');
       else toast('Ви більше не слідкуєте за цією людиною');
       refetchUser();
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.getPublications(filters),
+      });
     },
     onError: (err) => {
       toast('Щось пішло не так...');

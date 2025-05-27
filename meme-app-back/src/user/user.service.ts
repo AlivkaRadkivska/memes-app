@@ -26,7 +26,8 @@ export class UserService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.followers', 'followers')
-      .leftJoinAndSelect('user.followings', 'followings');
+      .leftJoinAndSelect('user.followings', 'followings')
+      .leftJoinAndSelect('user.publications', 'publications');
 
     if (filters?.isBanned !== undefined) {
       query.andWhere('user.isBanned = :isBanned', {
@@ -75,7 +76,7 @@ export class UserService {
 
   async getOne(id?: string, email?: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
-      relations: ['followers', 'followings'],
+      relations: ['followers', 'followings', 'publications'],
       where: [{ id }, { email }],
     });
     if (!user) throw new NotFoundException(['Користувача не знайдено']);

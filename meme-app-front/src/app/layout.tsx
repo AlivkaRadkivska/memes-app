@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/providers/theme-provider';
 import '@public/styles/globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,7 +40,7 @@ export default function RootLayout({
             <AuthProvider>
               <ReactQueryProvider>
                 {children}
-                {/* <ReactQueryDevtools initialIsOpen={false} position="bottom" /> */}
+                <ReactQueryDevtools initialIsOpen={false} position="bottom" />
               </ReactQueryProvider>
             </AuthProvider>
           </ThemeProvider>

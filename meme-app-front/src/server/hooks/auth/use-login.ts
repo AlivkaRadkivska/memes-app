@@ -4,6 +4,7 @@ import { AuthResult, LoginCredentials } from '@/server/types/auth';
 import { CommonError } from '@/server/types/common';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -16,11 +17,13 @@ export default function useLogin(
 ) {
   const { setAuthFromRedirect } = useAuth();
   const [errors, setErrors] = useState<string[] | undefined>(undefined);
+  const router = useRouter();
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: (data) => loginWithCredentials(data),
     onSuccess: (response) => {
       setAuthFromRedirect(response.accessToken, JSON.stringify(response.user));
+      router.push('/');
     },
     onError: (err) => {
       console.error('API Error:', err);

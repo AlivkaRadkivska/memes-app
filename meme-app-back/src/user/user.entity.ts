@@ -79,9 +79,13 @@ export class UserEntity {
   @IsInt()
   followingCount: number;
 
+  @IsInt()
+  publicationCount: number;
+
   @AfterLoad()
   getCounts(): void {
     this.followerCount = this.followers ? this.followers.length : 0;
     this.followingCount = this.followings ? this.followings.length : 0;
+    this.publicationCount = this.publications ? this.publications.length : 0;
   }
 }

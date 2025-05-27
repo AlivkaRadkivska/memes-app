@@ -1,30 +1,45 @@
 import { PublicationFilters } from '@/server/types/publication';
 import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
-export function usePublicationFilters(): Partial<PublicationFilters> {
+export function usePublicationFilters(
+  passingFilters?: Partial<PublicationFilters>
+) {
   const searchParams = useSearchParams();
+  const [filters, setFilters] = useState<Partial<PublicationFilters>>({
+    ...passingFilters,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const filters = useMemo(() => {
+  useEffect(() => {
     const getBoolean = (value: string | null): boolean | undefined =>
-      value === 'true' ? true : value === 'false' ? false : undefined;
+      value === 'true' ? true : false;
 
     const getNumber = (value: string | null): number | undefined =>
       value !== null ? Number(value) : undefined;
 
-    const params: Partial<PublicationFilters> = {
-      keywords: searchParams.get('keywords') ?? undefined,
-      status: searchParams.get('status') ?? undefined,
-      isBanned: getBoolean(searchParams.get('isBanned')),
-      search: searchParams.get('search') ?? undefined,
-      author: searchParams.get('author') ?? undefined,
-      createdAtDesc: getBoolean(searchParams.get('createdAtDesc')),
-      limit: getNumber(searchParams.get('limit')),
-      page: getNumber(searchParams.get('page')),
-    };
+    const params: Partial<PublicationFilters> = {};
 
-    return params;
+    if (!!searchParams.get('keywords'))
+      params.keywords = searchParams.get('keywords')!;
+
+    if (!!searchParams.get('search'))
+      params.search = searchParams.get('search')!;
+
+    if (!!searchParams.get('author'))
+      params.author = searchParams.get('author')!;
+
+    if (!!searchParams.get('createdAtDesc'))
+      params.createdAtDesc = getBoolean(searchParams.get('createdAtDesc'))!;
+
+    if (!!searchParams.get('limit'))
+      params.limit = getNumber(searchParams.get('limit'))!;
+
+    if (!!searchParams.get('page'))
+      params.page = getNumber(searchParams.get('page'))!;
+
+    setFilters((prev) => ({ ...prev, ...params }));
   }, [searchParams]);
 
-  return filters;
+  return { filters, currentPage, setCurrentPage, setFilters };
 }

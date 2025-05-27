@@ -68,8 +68,8 @@ export class PublicationService {
     }
 
     if (filters?.authorId) {
-      query.andWhere('author.id IS :authorId', {
-        authorId: `%${filters.authorId}%`,
+      query.andWhere('author.id = :authorId', {
+        authorId: filters.authorId,
       });
     }
 
