@@ -38,6 +38,7 @@ export interface PublicationFilters {
   author?: string;
   authorId?: string;
   createdAtDesc?: boolean;
+  onlyFollowing?: boolean;
 
   limit?: number;
   page?: number;

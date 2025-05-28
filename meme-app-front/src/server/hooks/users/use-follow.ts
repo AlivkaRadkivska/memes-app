@@ -36,6 +36,12 @@ export default function useFollow(
         queryKey: queryKeys.getPublications(filters),
       });
       queryClient.invalidateQueries({
+        queryKey: queryKeys.getPublications({
+          ...filters,
+          onlyFollowing: true,
+        }),
+      });
+      queryClient.invalidateQueries({
         queryKey: queryKeys.getUser({ email: following?.email }),
       });
       refetchUser();

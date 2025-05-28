@@ -6,14 +6,18 @@ import { PublicationCard } from './publication-card';
 import { Skeleton } from '../ui/skeleton';
 import { LoaderCircle } from 'lucide-react';
 
-export function PublicationsContainer() {
+export function PublicationsContainer({
+  onlyFollowing,
+}: {
+  onlyFollowing?: boolean;
+}) {
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isInitialFetching,
     isFetchingNextPage,
-  } = useGetPublications({ limit: 3, status: 'active' });
+  } = useGetPublications({ limit: 3, status: 'active', onlyFollowing });
 
   const { ref, inView } = useInView({ threshold: 1 });
 

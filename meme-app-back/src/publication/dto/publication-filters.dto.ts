@@ -6,6 +6,7 @@ export class PublicationFiltersDto {
   author?: string;
   authorId?: string;
   createdAtDesc?: boolean;
+  onlyFollowing?: boolean;
 
   limit?: number;
   page?: number;

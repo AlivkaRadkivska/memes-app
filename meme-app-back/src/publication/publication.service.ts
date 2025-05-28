@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { FollowEntity } from 'src/follow/follow.entity';
 import { FollowService } from 'src/follow/follow.service';
 import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
@@ -30,6 +31,15 @@ export class PublicationService {
       .leftJoinAndSelect('publication.comments', 'comments')
       .leftJoinAndSelect('publication.author', 'author');
 
+    if (filters?.onlyFollowing && user) {
+      query.innerJoin(
+        FollowEntity,
+        'follow',
+        'follow.following = publication.author AND follow.follower = :userId',
+        { userId: user.id },
+      );
+    }
+
     if (filters?.keywords && filters.keywords.length > 0) {
       query.andWhere(
         'EXISTS (SELECT 1 FROM unnest(publication.keywords) keyword WHERE keyword ILIKE ANY(:keywords))',
@@ -44,12 +54,6 @@ export class PublicationService {
     if (filters?.status) {
       query.andWhere('publication.status = :status', {
         status: filters.status,
-      });
-    }
-
-    if (filters?.isBanned !== undefined) {
-      query.andWhere('publication.isBanned = :isBanned', {
-        isBanned: filters.isBanned,
       });
     }
 

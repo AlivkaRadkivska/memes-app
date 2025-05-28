@@ -1,4 +1,5 @@
 'use client';
+
 import { useAuth } from '@/contexts/auth-context';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
@@ -12,12 +13,18 @@ export function Header() {
   const router = useRouter();
 
   const renderCenterContent = () => {
-    if (pathname === '/') {
+    if (pathname === '/' || pathname === '/follows') {
       return (
-        <Tabs defaultValue="main">
+        <Tabs value={pathname}>
           <TabsList>
-            <TabsTrigger value="main">Шось новеньке</TabsTrigger>
-            <TabsTrigger value="followings" disabled={!isAuthenticated}>
+            <TabsTrigger value="/" onClick={() => router.push('/')}>
+              Шось новеньке
+            </TabsTrigger>
+            <TabsTrigger
+              value="/follows"
+              onClick={() => router.push('/follows')}
+              disabled={!isAuthenticated}
+            >
               Меми друзів
             </TabsTrigger>
           </TabsList>
