@@ -37,6 +37,7 @@ export default function SignupForm() {
       password: '',
       repeatPassword: '',
       fullName: '',
+      signature: '',
     },
   });
 
@@ -172,6 +173,32 @@ export default function SignupForm() {
                 <div className="relative min-h-full">
                   <Input
                     placeholder="Name Surname"
+                    className={cn(
+                      'resize-none transition-all w-full',
+                      field.value && field.value.length > 0 && 'pr-16'
+                    )}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="signature"
+          render={({ field }) => (
+            <FormItem className="space-y-2 transition-all w-full h-full">
+              <FormLabel className="text-base font-medium">
+                Якась дуже важлива інформація, що буде в профілі (не
+                обов&apos;язково)
+              </FormLabel>
+              <FormControl>
+                <div className="relative min-h-full">
+                  <Input
+                    placeholder="Пафосна цитата"
                     className={cn(
                       'resize-none transition-all w-full',
                       field.value && field.value.length > 0 && 'pr-16'

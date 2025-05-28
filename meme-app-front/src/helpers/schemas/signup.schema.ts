@@ -1,5 +1,5 @@
+import { isDate, isValid } from 'date-fns';
 import { z } from 'zod';
-import { isValid, isDate } from 'date-fns';
 
 export const signupFormSchema = z
   .object({
@@ -11,6 +11,11 @@ export const signupFormSchema = z
     fullName: z
       .string()
       .max(30, 'Повне ім’я задовге')
+      .optional()
+      .or(z.literal('')),
+    signature: z
+      .string()
+      .max(300, 'Коротше, будь ласка')
       .optional()
       .or(z.literal('')),
     avatar: z.instanceof(File).optional(),

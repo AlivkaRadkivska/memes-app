@@ -11,6 +11,7 @@ export interface SignupCredentials {
   password: string;
   repeatPassword: string;
   fullName?: string;
+  signature?: string;
   birthday?: Date;
   avatar?: File;
 }

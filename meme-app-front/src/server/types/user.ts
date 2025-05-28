@@ -22,3 +22,14 @@ export interface FollowResponse {
   follower: { id: string; email: string };
   following: { id: string };
 }
+
+export interface UserUpdatePayload {
+  email?: string;
+  username?: string;
+  password?: string;
+  newPassword?: string;
+  fullName?: string;
+  signature?: string;
+  birthday?: Date;
+  avatar?: File;
+}

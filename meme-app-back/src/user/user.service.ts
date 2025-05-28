@@ -5,11 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { FollowService } from 'src/follow/follow.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
 import { UserEntity } from './user.entity';
 
@@ -125,10 +127,65 @@ export class UserService {
     }
   }
 
+  async updateOne(
+    user: UserEntity,
+    updateUserDto: UpdateUserDto,
+    picture?: Express.Multer.File,
+  ): Promise<Partial<UserEntity>> {
+    try {
+      const userInfo = await this.getOne({ id: user.id });
+
+      let avatar = userInfo.avatar;
+      if (picture) {
+        const pictureUrl = await this.fileUploadService.uploadFiles([picture]);
+        avatar = pictureUrl[0];
+
+        userInfo.avatar &&
+          (await this.fileUploadService.deleteFiles([userInfo.avatar]));
+      }
+
+      let hashedPassword: string = userInfo.password;
+      if (updateUserDto.newPassword) {
+        if (await bcrypt.compare(userInfo.password, updateUserDto.password))
+          hashedPassword = await this.getHashedPassword(
+            updateUserDto.newPassword,
+          );
+        else throw new ConflictException(['Неправильний поточний пароль']);
+      }
+
+      const updatedUser = {
+        ...userInfo,
+        ...updateUserDto,
+        lastUpdatedAt: new Date(Date.now()).toISOString(),
+        avatar,
+        password: hashedPassword,
+      };
+
+      await this.userRepository.save(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.log(error);
+
+      if (error.code == 23505)
+        throw new ConflictException(['Email вже зайнятий']);
+      else if (error.status == 409)
+        throw new ConflictException(['Неправильний пароль']);
+      else {
+        console.error(error);
+        throw new InternalServerErrorException();
+      }
+    }
+  }
+
   async deleteOne(id: string): Promise<void> {
     const res = await this.userRepository.delete({ id });
 
     if (res.affected === 0)
       throw new NotFoundException(['Користувача не знайдено']);
+  }
+
+  async getHashedPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(9);
+    return await bcrypt.hash(password, salt);
   }
 }

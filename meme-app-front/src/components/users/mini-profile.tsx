@@ -67,7 +67,7 @@ export function MiniProfile({ isCollapsed }: { isCollapsed: boolean }) {
           'w-full',
           isCollapsed ? 'justify-center' : 'justify-start'
         )}
-        onClick={() => router.push('/my-profile/edit')}
+        onClick={() => router.push('/my-profile/update')}
       >
         <Pen className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
         {!isCollapsed && 'Змінити інфо'}

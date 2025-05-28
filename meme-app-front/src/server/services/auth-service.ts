@@ -25,6 +25,8 @@ export const signupWithCredentials = async (
   formData.append('repeatPassword', signupCredentials.repeatPassword);
   if (!!signupCredentials.fullName)
     formData.append('fullName', signupCredentials.fullName);
+  if (!!signupCredentials.signature)
+    formData.append('signature', signupCredentials.signature);
   if (!!signupCredentials.birthday)
     formData.append('birthday', signupCredentials.birthday.toISOString());
 

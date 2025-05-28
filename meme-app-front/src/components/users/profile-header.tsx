@@ -109,7 +109,7 @@ export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
                 <Button
                   variant="outline"
                   size="default"
-                  onClick={() => router.push('/my-profile/edit')}
+                  onClick={() => router.push('/my-profile/update')}
                 >
                   <Pen className="h-4 w-4 mr-2" />
                   Змінити інфо

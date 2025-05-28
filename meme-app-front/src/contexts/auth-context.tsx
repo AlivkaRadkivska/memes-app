@@ -67,11 +67,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const setAuthFromRedirect = (tokenStr: string) => {
     try {
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+
       setToken(tokenStr);
       cookies.set('auth_token', tokenStr, {
         path: '/',
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
+        expires: threeDaysFromNow,
       });
     } catch (error) {
       console.error('Error setting auth from redirect:', error);

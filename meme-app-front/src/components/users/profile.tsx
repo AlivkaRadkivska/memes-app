@@ -1,12 +1,21 @@
 'use client';
 
+import { useAuth } from '@/contexts/auth-context';
 import useGetUser from '@/server/hooks/users/use-get-user';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { ProfileHeader } from './profile-header';
 import { PublicationGrid } from './profile-publications';
 
 export default function Profile({ email }: { email: string }) {
+  const router = useRouter();
+  const { user: currentUser } = useAuth();
   const { user, isInitialFetching } = useGetUser(email);
+
+  useEffect(() => {
+    if (user && currentUser && user.id === currentUser.id)
+      router.push('/my-profile');
+  }, [currentUser, router, user]);
 
   if (isInitialFetching) return <p>Loading</p>;
 
