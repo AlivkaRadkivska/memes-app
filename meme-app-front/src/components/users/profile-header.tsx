@@ -45,7 +45,11 @@ export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
         <div className="flex h-full gap-6 items-start">
           <div className="relative">
             <Avatar className="h-32 w-32 rounded-full border-4 border-background">
-              <AvatarImage src={avatar} alt={username} />
+              <AvatarImage
+                src={avatar}
+                alt={username}
+                className="object-cover"
+              />
               <AvatarFallback>Ніц</AvatarFallback>
             </Avatar>
           </div>

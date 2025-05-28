@@ -53,6 +53,7 @@ export function CommentItem({
                 <AvatarImage
                   src="https://github.com/shadcn.png"
                   alt={user.email}
+                  className="object-cover"
                 />
                 <AvatarFallback>{user.username}</AvatarFallback>
               </Avatar>

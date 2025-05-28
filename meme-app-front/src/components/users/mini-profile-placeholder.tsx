@@ -22,7 +22,11 @@ export function MiniProfilePlaceholder({
         )}
         onClick={() => router.push('/auth')}
       >
-        <AvatarImage src={'https://github.com/shadcn.png'} alt={'guest'} />
+        <AvatarImage
+          src={'https://github.com/shadcn.png'}
+          alt={'guest'}
+          className="object-cover"
+        />
         <AvatarFallback className="bg-primary/10 text-primary">
           {'Гість'}
         </AvatarFallback>

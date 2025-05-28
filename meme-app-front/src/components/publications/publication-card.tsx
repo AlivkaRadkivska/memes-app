@@ -142,7 +142,11 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             onClick={() => router.push(`/profile/${author.email}`)}
           >
             <Avatar className="w-16 h-16">
-              <AvatarImage src={author.avatar} alt={author.username} />
+              <AvatarImage
+                src={author.avatar}
+                alt={author.username}
+                className="object-cover"
+              />
               <AvatarFallback>Ніц</AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-2">

@@ -20,7 +20,11 @@ export function MiniProfile({ isCollapsed }: { isCollapsed: boolean }) {
         )}
         onClick={() => router.push('/my-profile')}
       >
-        <AvatarImage src={user?.avatar} alt={user?.username} />
+        <AvatarImage
+          src={user?.avatar}
+          alt={user?.username}
+          className="object-cover"
+        />
         <AvatarFallback className="bg-primary/10 text-primary">
           Ніц
         </AvatarFallback>
