@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
 import { LogOut, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { SidebarToggle } from '../ui/sidebar-toggle';
 import { MiniProfile } from '../users/mini-profile';
@@ -16,9 +16,26 @@ interface UserSidebarProps {
 }
 
 export function UserSidebar({ className }: UserSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean | null>(null);
   const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    const stored = localStorage.getItem('sidebar-collapsed');
+    if (stored !== null) {
+      setIsCollapsed(stored === 'true');
+    } else {
+      setIsCollapsed(true); // fallback default
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isCollapsed !== null) {
+      localStorage.setItem('sidebar-collapsed', String(isCollapsed));
+    }
+  }, [isCollapsed]);
+
+  if (isCollapsed === null) return null;
 
   return (
     <aside

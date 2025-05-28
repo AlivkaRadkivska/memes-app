@@ -31,6 +31,7 @@ export class PublicationEntity {
   @Transform(({ value }) => {
     return {
       id: value.id,
+      avatar: value.avatar,
       username: value.username,
       fullName: value.fullName,
       email: value.email,
@@ -50,7 +51,7 @@ export class PublicationEntity {
   lastUpdatedAt: Date;
 
   @Column()
-  @IsIn(['active', 'hidden', 'draft'])
+  @IsIn(['active', 'hidden'])
   status: string;
 
   @Column({ name: 'is_banned', default: false })

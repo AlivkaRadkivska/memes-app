@@ -24,6 +24,9 @@ export class UserEntity {
   @Column()
   username: string;
 
+  @Column({ nullable: true })
+  avatar?: string;
+
   @Exclude({ toPlainOnly: true })
   @Column({ nullable: true })
   password?: string;
@@ -76,9 +79,34 @@ export class UserEntity {
   @IsInt()
   followingCount: number;
 
+  @IsInt()
+  publicationCount: number;
+
+  isFollowing: boolean;
+
   @AfterLoad()
   getCounts(): void {
     this.followerCount = this.followers ? this.followers.length : 0;
     this.followingCount = this.followings ? this.followings.length : 0;
+
+    if (this.publications) {
+      const activePublications = this.publications.filter(
+        (publication) => publication.status === 'active',
+      );
+      this.publicationCount = activePublications.length;
+    } else {
+      this.publicationCount = 0;
+    }
+  }
+
+  setIsFollowing(user?: Partial<UserEntity>, follows?: FollowEntity[]): void {
+    if (!user || !follows) {
+      this.isFollowing = false;
+      return;
+    }
+
+    this.isFollowing = follows.some(
+      (follow) => follow.following?.id === this.id,
+    );
   }
 }

@@ -5,7 +5,7 @@ interface GalleryPageProps {
 }
 
 export default async function GalleryPage({ params }: GalleryPageProps) {
-  const { id } = await params;
+  const id = decodeURIComponent((await params).id);
 
   return (
     <div className="min-h-[calc(100vh-60px)] flex flex-col">

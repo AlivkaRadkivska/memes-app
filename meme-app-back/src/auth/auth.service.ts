@@ -24,7 +24,7 @@ export class AuthService {
   ) {}
 
   async getProfile(user: Partial<UserEntity>): Promise<UserEntity> {
-    return this.userService.getOne(user.id);
+    return this.userService.getOne({ id: user.id });
   }
 
   async signIn(
@@ -32,7 +32,7 @@ export class AuthService {
   ): Promise<AuthResultDto> {
     const { email, password } = signInCredentialsDto;
 
-    const user = await this.userService.getOne(undefined, email);
+    const user = await this.userService.getOne({ email });
 
     if (!user)
       throw new UnauthorizedException(['Користувач не зареєстрований']);
@@ -63,6 +63,7 @@ export class AuthService {
 
   async signUp(
     signUpCredentialsDto: SignUpCredentialsDto,
+    picture?: Express.Multer.File,
   ): Promise<AuthResultDto> {
     const { password, repeatPassword } = signUpCredentialsDto;
 
@@ -71,11 +72,14 @@ export class AuthService {
 
     const hashedPassword = await this.getHashedPassword(password);
 
-    const user = await this.userService.createOne({
-      ...signUpCredentialsDto,
-      password: hashedPassword,
-      role: 'user',
-    });
+    const user = await this.userService.createOne(
+      {
+        ...signUpCredentialsDto,
+        password: hashedPassword,
+        role: 'user',
+      },
+      picture,
+    );
 
     return {
       user: {
@@ -93,7 +97,7 @@ export class AuthService {
     let user: UserEntity;
 
     try {
-      user = await this.userService.getOne(undefined, email);
+      user = await this.userService.getOne({ email });
     } catch (error) {
       console.error(error);
       if (error.status == 404) {

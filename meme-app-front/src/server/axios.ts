@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'universal-cookie';
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
@@ -8,14 +9,12 @@ export const axiosInstance = axios.create({
   },
 });
 
+const cookies = new Cookies();
+
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token =
-      typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    const token = cookies.get('auth_token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
 
     return config;
   },

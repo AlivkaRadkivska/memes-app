@@ -11,10 +11,15 @@ const getComments = (filters?: Partial<CommentFilters>) => [
   filters,
 ];
 const getCurrentUser = () => ['get-current-user'];
+const getUser = (params?: { email?: string; id?: string }) => [
+  'get-user',
+  params,
+];
 
 export const queryKeys = {
   getPublications,
   generateAiImage,
   getComments,
   getCurrentUser,
+  getUser,
 } as const;

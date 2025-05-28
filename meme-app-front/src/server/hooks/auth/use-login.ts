@@ -15,9 +15,9 @@ export default function useLogin(
     LoginCredentials
   >
 ) {
-  const router = useRouter();
   const { setAuthFromRedirect } = useAuth();
   const [errors, setErrors] = useState<string[] | undefined>(undefined);
+  const router = useRouter();
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: (data) => loginWithCredentials(data),

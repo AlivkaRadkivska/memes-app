@@ -1,7 +1,6 @@
-import { Comment } from './comment';
-
 export interface Author {
   id: string;
+  avatar: string;
   username: string;
   fullName: string;
   email: string;
@@ -15,7 +14,7 @@ export interface Publication {
   author: Author;
   createdAt: Date;
   lastUpdatedAt: Date;
-  status: string;
+  status: 'active' | 'hidden';
   isBanned: boolean;
   banReason?: string;
   banExpiresAt?: Date;
@@ -23,8 +22,6 @@ export interface Publication {
   commentCount: number;
   isLiked: boolean;
   isFollowing: boolean;
-
-  comments: Comment[];
 }
 
 export interface PublishMemesPayload {
@@ -36,11 +33,12 @@ export interface PublishMemesPayload {
 
 export interface PublicationFilters {
   keywords?: string;
-  status?: string;
-  isBanned?: boolean;
+  status?: 'active' | 'hidden';
   search?: string;
   author?: string;
+  authorId?: string;
   createdAtDesc?: boolean;
+  onlyFollowing?: boolean;
 
   limit?: number;
   page?: number;

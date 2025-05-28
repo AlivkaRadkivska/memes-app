@@ -17,7 +17,7 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException([]);
     }
     try {
       const { secret } = getJwtOptions(new ConfigService());
@@ -27,7 +27,7 @@ export class JwtAuthGuard implements CanActivate {
       });
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException([]);
     }
     return true;
   }

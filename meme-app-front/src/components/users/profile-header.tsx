@@ -1,0 +1,153 @@
+'use client';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/auth-context';
+import useFollow from '@/server/hooks/users/use-follow';
+import { User } from '@/server/types/user';
+import { format } from 'date-fns';
+import { uk } from 'date-fns/locale';
+import { LogOut, PawPrint, Pen, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+interface ProfileHeaderProps {
+  user: User;
+  me?: boolean;
+}
+
+export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
+  const {
+    avatar,
+    username,
+    fullName,
+    signature,
+    email,
+    birthday,
+    followerCount,
+    followingCount,
+    publicationCount,
+    isFollowing,
+  } = user;
+
+  const router = useRouter();
+  const { logout } = useAuth();
+  const { follow, isPending: isPendingFollow } = useFollow(user);
+
+  const handleFollow = () => {
+    follow({ followingId: user.id, isFollowed: user.isFollowing });
+  };
+
+  return (
+    <div className="w-full bg-background">
+      <div className="container px-4 py-6 mx-auto max-w-5xl">
+        <div className="flex h-full gap-6 items-start">
+          <div className="relative">
+            <Avatar className="h-32 w-32 rounded-full border-4 border-background">
+              <AvatarImage
+                src={avatar}
+                alt={username}
+                className="object-cover"
+              />
+              <AvatarFallback>Ніц</AvatarFallback>
+            </Avatar>
+          </div>
+
+          <div className="h-full w-full flex justify-between gap-4">
+            <div className="flex flex-col gap-3 h-full justify-between">
+              <div className="flex items-center text-muted-foreground">
+                <h1 className="text-2xl font-bold">@{username}</h1>
+                {fullName && (
+                  <>
+                    <span className="mx-2">•</span>
+                    <Badge variant="outline" className="text-lg">
+                      {fullName}
+                    </Badge>
+                  </>
+                )}
+                {isFollowing && <PawPrint size={25} className="ml-1 -mt-7" />}
+              </div>
+
+              <span>{email}</span>
+
+              {birthday && (
+                <span>
+                  <span className="text-muted-foreground">
+                    Поява на цей світ:
+                  </span>{' '}
+                  {format(birthday, 'PPP', { locale: uk })}
+                </span>
+              )}
+
+              <div className="flex gap-4 items-center mt-auto text-sm">
+                <div className="flex gap-1">
+                  <span className="font-semibold">
+                    {followerCount.toLocaleString()}
+                  </span>
+                  <span className="text-muted-foreground">Підписники</span>
+                </div>
+
+                <div className="flex gap-1">
+                  <span className="font-semibold">
+                    {followingCount.toLocaleString()}
+                  </span>
+                  <span className="text-muted-foreground">Підписки</span>
+                </div>
+
+                <div className="flex gap-1">
+                  <span className="font-semibold">
+                    {publicationCount.toLocaleString()}
+                  </span>
+                  <span className="text-muted-foreground">Постів</span>
+                </div>
+              </div>
+            </div>
+
+            {me ? (
+              <div className="flex flex-col gap-3">
+                <Button variant="secondary" size="default" onClick={logout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Вийти з аку
+                </Button>
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={() => router.push('/my-profile/update')}
+                >
+                  <Pen className="h-4 w-4 mr-2" />
+                  Змінити інфо
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={handleFollow}
+                disabled={isPendingFollow}
+                variant={isFollowing ? 'outline' : 'default'}
+              >
+                {!isFollowing && <PawPrint />}
+                {isFollowing ? 'Відписатися' : 'Підписатися'}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="w-full mt-3 flex align-baseline justify-between">
+          <p className="text-foreground italic">{signature || ''}</p>
+          {me && (
+            <Button
+              variant="default"
+              size="default"
+              onClick={() => router.push('/gallery')}
+              className="w-max"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Підкинути мемчиків
+            </Button>
+          )}
+        </div>
+      </div>
+      <Separator />
+    </div>
+  );
+}

@@ -2,9 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
+import { formatDate } from '@/helpers/publication-utils';
+import useDeleteComment from '@/server/hooks/comments/use-delete-comment';
 import { Comment } from '@/server/types/comment';
-import { formatDistanceToNow } from 'date-fns';
-import { uk } from 'date-fns/locale';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import PhotoCard from '../photos/photo-card';
@@ -18,7 +18,6 @@ import {
   AlertDialogTitle,
 } from '../ui/alert-dialog';
 import { Button } from '../ui/button';
-import useDeleteComment from '@/server/hooks/comments/use-delete-comment';
 
 interface CommentItemProps {
   publicationId: string;
@@ -35,11 +34,6 @@ export function CommentItem({
   const { deleteComment, isPending } = useDeleteComment({ publicationId });
 
   const [confirmDelete, setConfirmDelete] = useState(false);
-
-  const formattedDate = formatDistanceToNow(new Date(createdAt), {
-    addSuffix: true,
-    locale: uk,
-  });
 
   const handleDeleteComment = () => {
     deleteComment(id);
@@ -59,6 +53,7 @@ export function CommentItem({
                 <AvatarImage
                   src="https://github.com/shadcn.png"
                   alt={user.email}
+                  className="object-cover"
                 />
                 <AvatarFallback>{user.username}</AvatarFallback>
               </Avatar>
@@ -77,14 +72,14 @@ export function CommentItem({
             </div>
             <div className="flex-1 w-full">
               <div className="w-full flex items-start justify-between">
-                <div className="flex gap-2 items-baseline">
-                  <p className="text-lg">{user.username}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex flex-col gap-0">
+                  <p>{user.username}</p>
+                  <p className="text-xs text-muted-foreground">
                     ({user.email})
                   </p>
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  {formattedDate}
+                  {formatDate(createdAt)}
                 </span>
               </div>
               <p className="text-foreground/90 italic mt-3">{text}</p>

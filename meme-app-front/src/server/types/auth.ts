@@ -11,7 +11,9 @@ export interface SignupCredentials {
   password: string;
   repeatPassword: string;
   fullName?: string;
+  signature?: string;
   birthday?: Date;
+  avatar?: File;
 }
 
 export interface AuthResult {
@@ -29,7 +31,6 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   refetchUser: () => void;
-  login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
   setAuthFromRedirect: (token: string, user: string) => void;
 }

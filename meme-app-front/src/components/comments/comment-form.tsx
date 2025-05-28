@@ -52,8 +52,7 @@ export function CommentForm({ publicationId }: CommentFormProps) {
       />
       {selectedImage && (
         <PhotoCard
-          width={14}
-          height={28}
+          height={16}
           photo={{ ...selectedImage }}
           onDelete={() => setSelectedImage(null)}
         />
