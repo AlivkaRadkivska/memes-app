@@ -1,17 +1,11 @@
-export interface Author {
-  id: string;
-  avatar: string;
-  username: string;
-  fullName: string;
-  email: string;
-}
+import { MiniUser } from './user';
 
 export interface Publication {
   id: string;
   pictures: string[];
   description: string;
   keywords: string[];
-  author: Author;
+  author: MiniUser;
   createdAt: Date;
   lastUpdatedAt: Date;
   status: 'active' | 'hidden';

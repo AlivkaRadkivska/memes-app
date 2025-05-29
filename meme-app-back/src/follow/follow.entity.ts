@@ -20,6 +20,8 @@ export class FollowEntity {
       id: value.id,
       username: value.username,
       email: value.email,
+      avatar: value.avatar,
+      fullName: value.fullName,
     };
   })
   @ManyToOne(() => UserEntity, (user) => user.followings, {
@@ -34,6 +36,8 @@ export class FollowEntity {
       id: value.id,
       username: value.username,
       email: value.email,
+      avatar: value.avatar,
+      fullName: value.fullName,
     };
   })
   @ManyToOne(() => UserEntity, (user) => user.followers, {

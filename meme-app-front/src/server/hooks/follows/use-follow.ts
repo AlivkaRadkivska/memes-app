@@ -1,8 +1,9 @@
 import { useAuth } from '@/contexts/auth-context';
 import { queryKeys } from '@/server/queryKeys';
-import { startFollow, stopFollow } from '@/server/services/user-service';
+import { startFollow, stopFollow } from '@/server/services/follow-service';
 import { CommonError } from '@/server/types/common';
-import { FollowResponse, User } from '@/server/types/user';
+import { FollowResponse } from '@/server/types/follows';
+import { User } from '@/server/types/user';
 import {
   useMutation,
   UseMutationOptions,
@@ -45,7 +46,6 @@ export default function useFollow(
         queryKey: queryKeys.getUser({ email: following?.email }),
       });
       refetchUser();
-      console.log(following?.email);
     },
     onError: (err) => {
       toast('Щось пішло не так...');

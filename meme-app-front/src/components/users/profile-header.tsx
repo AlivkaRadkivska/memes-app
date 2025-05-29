@@ -5,12 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/auth-context';
-import useFollow from '@/server/hooks/users/use-follow';
+import useFollow from '@/server/hooks/follows/use-follow';
+import useGetFollowers from '@/server/hooks/follows/use-get-followers';
+import useGetFollowings from '@/server/hooks/follows/use-get-followings';
 import { User } from '@/server/types/user';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
 import { LogOut, PawPrint, Pen, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { FollowModal } from '../follows/follow-modal';
 
 interface ProfileHeaderProps {
   user: User;
@@ -34,6 +37,8 @@ export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
   const router = useRouter();
   const { logout } = useAuth();
   const { follow, isPending: isPendingFollow } = useFollow(user);
+  const { followers } = useGetFollowers(user.id);
+  const { followings } = useGetFollowings(user.id);
 
   const handleFollow = () => {
     follow({ followingId: user.id, isFollowed: user.isFollowing });
@@ -81,19 +86,30 @@ export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
               )}
 
               <div className="flex gap-4 items-center mt-auto text-sm">
-                <div className="flex gap-1">
-                  <span className="font-semibold">
-                    {followerCount.toLocaleString()}
-                  </span>
-                  <span className="text-muted-foreground">Підписники</span>
-                </div>
+                <FollowModal
+                  follows={followers || []}
+                  trigger={
+                    <Button variant="link" className="flex gap-1">
+                      <span className="font-semibold">
+                        {followerCount.toLocaleString()}
+                      </span>
+                      <span className="text-muted-foreground">Підписники</span>
+                    </Button>
+                  }
+                />
 
-                <div className="flex gap-1">
-                  <span className="font-semibold">
-                    {followingCount.toLocaleString()}
-                  </span>
-                  <span className="text-muted-foreground">Підписки</span>
-                </div>
+                <FollowModal
+                  follows={followings || []}
+                  title="Підписки"
+                  trigger={
+                    <Button variant="link" className="flex gap-1">
+                      <span className="font-semibold">
+                        {followingCount.toLocaleString()}
+                      </span>
+                      <span className="text-muted-foreground">Підписки</span>
+                    </Button>
+                  }
+                />
 
                 <div className="flex gap-1">
                   <span className="font-semibold">

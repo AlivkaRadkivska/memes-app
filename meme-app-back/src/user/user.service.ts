@@ -164,7 +164,7 @@ export class UserService {
       await this.userRepository.save(updatedUser);
       return updatedUser;
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       if (error.code == 23505)
         throw new ConflictException(['Email вже зайнятий']);
