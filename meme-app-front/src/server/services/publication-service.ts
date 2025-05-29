@@ -17,7 +17,8 @@ export const fetchPublications = async (
 export const generateAiImage = async (
   prompt: string
 ): Promise<AiImageResponse> => {
-  const response = await fetch('/api/ai-image', {
+  const aiURL = process.env.NEXT_PUBLIC_AI_URL || '';
+  const response = await fetch(`${aiURL}/api/ai-image`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
