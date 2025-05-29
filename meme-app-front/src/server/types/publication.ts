@@ -1,25 +1,21 @@
-export interface Author {
-  id: string;
-  username: string;
-  fullName: string;
-  email: string;
-}
+import { MiniUser } from './user';
 
 export interface Publication {
   id: string;
   pictures: string[];
   description: string;
   keywords: string[];
-  author: Author;
+  author: MiniUser;
   createdAt: Date;
   lastUpdatedAt: Date;
-  status: string;
+  status: 'active' | 'hidden';
   isBanned: boolean;
   banReason?: string;
   banExpiresAt?: Date;
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
+  isFollowing: boolean;
 }
 
 export interface PublishMemesPayload {
@@ -31,11 +27,12 @@ export interface PublishMemesPayload {
 
 export interface PublicationFilters {
   keywords?: string;
-  status?: string;
-  isBanned?: boolean;
+  status?: 'active' | 'hidden';
   search?: string;
   author?: string;
+  authorId?: string;
   createdAtDesc?: boolean;
+  onlyFollowing?: boolean;
 
   limit?: number;
   page?: number;

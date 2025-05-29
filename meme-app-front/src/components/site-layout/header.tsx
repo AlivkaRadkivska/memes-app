@@ -1,23 +1,30 @@
 'use client';
+
+import { useAuth } from '@/contexts/auth-context';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { SearchInput } from './search-input';
 import { ThemeToggle } from './theme-toggle';
-import { useAuth } from '@/contexts/auth-context';
 
 export function Header() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
   const renderCenterContent = () => {
-    if (pathname === '/') {
+    if (pathname === '/' || pathname === '/follows') {
       return (
-        <Tabs defaultValue="main">
+        <Tabs value={pathname}>
           <TabsList>
-            <TabsTrigger value="main">Шось новеньке</TabsTrigger>
-            <TabsTrigger value="followings" disabled={!isAuthenticated}>
+            <TabsTrigger value="/" onClick={() => router.push('/')}>
+              Шось новеньке
+            </TabsTrigger>
+            <TabsTrigger
+              value="/follows"
+              onClick={() => router.push('/follows')}
+              disabled={!isAuthenticated}
+            >
               Меми друзів
             </TabsTrigger>
           </TabsList>
@@ -29,8 +36,8 @@ export function Header() {
       return <p className="text-center h-full text-xl">Авторизація</p>;
     }
 
-    if (pathname.startsWith('/profile')) {
-      return <p className="text-center">Профіль</p>;
+    if (pathname.startsWith('/my-profile')) {
+      return <p className="text-center h-full text-xl">{user?.username}</p>;
     }
 
     return null;

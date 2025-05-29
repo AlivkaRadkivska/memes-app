@@ -1,116 +1,100 @@
 'use client';
 
-import {
-  getCurrentUser,
-  loginWithCredentials,
-} from '@/server/services/auth-service';
-import { AuthContextType, LoginCredentials } from '@/server/types/auth';
+import { queryKeys } from '@/server/queryKeys';
+import { getCurrentUser } from '@/server/services/auth-service';
+import { AuthContextType } from '@/server/types/auth';
 import { User } from '@/server/types/user';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import Cookies from 'universal-cookie';
 
+const cookies = new Cookies();
+
 const AuthContext = createContext<AuthContextType>({
-  user: null,
-  token: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => {},
+  refetchUser: () => {},
   logout: () => {},
   setAuthFromRedirect: () => {},
 });
 
-const cookies = new Cookies();
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const [token, setToken] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    data: currentUser,
+    isLoading: isCurrentUserLoading,
+    refetch,
+  } = useQuery<User | undefined>({
+    queryKey: queryKeys.getCurrentUser(),
+    queryFn: () => getCurrentUser(),
+    enabled: !!token,
+  });
 
   useEffect(() => {
-    (async () => {
-      const storedToken = localStorage.getItem('auth_token');
+    const storedToken = cookies.get('auth_token');
 
-      if (storedToken) {
-        setToken(storedToken);
+    if (storedToken) setToken(storedToken);
+    else setIsLoading(false);
+  }, []);
 
-        try {
-          const currentUser = await getCurrentUser();
-          setUser(currentUser);
-        } catch (error) {
-          console.error('Token verification failed:', error);
-
-          localStorage.removeItem('auth_token');
-          setToken(null);
-          setUser(null);
-        }
+  useEffect(() => {
+    if (!isCurrentUserLoading) {
+      if (!currentUser && token) {
+        cookies.remove('auth_token', { path: '/' });
+        setToken(undefined);
       }
-
-      setIsLoading(false);
-    })();
-  }, [token]);
-
-  const login = async (credentials: LoginCredentials) => {
-    setIsLoading(true);
-    try {
-      const result = await loginWithCredentials(credentials);
-      setToken(result.accessToken);
-
-      localStorage.setItem('auth_token', result.accessToken);
-      cookies.set('auth_token', result.accessToken, {
-        path: '/',
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      });
-
-      router.push('/');
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentUser, isCurrentUserLoading, token]);
 
   const logout = async () => {
     setIsLoading(true);
 
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      cookies.remove('auth_token', { path: '/' });
-      setToken(null);
-      setUser(null);
-    }
+    cookies.remove('auth_token', { path: '/' });
+    setToken(undefined);
+
+    queryClient.invalidateQueries({ queryKey: queryKeys.getCurrentUser() });
+    router.push('/auth');
 
     setIsLoading(false);
-    router.push('/auth');
   };
 
   const setAuthFromRedirect = (tokenStr: string) => {
     try {
-      setToken(tokenStr);
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
 
-      localStorage.setItem('auth_token', tokenStr);
+      setToken(tokenStr);
       cookies.set('auth_token', tokenStr, {
         path: '/',
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
+        expires: threeDaysFromNow,
       });
     } catch (error) {
       console.error('Error setting auth from redirect:', error);
     }
   };
 
-  const contextValue: AuthContextType = {
-    user,
-    token,
-    isAuthenticated: !!token && !!user,
-    isLoading,
-    login,
-    logout,
-    setAuthFromRedirect,
-  };
+  const contextValue: AuthContextType = useMemo(
+    () => ({
+      user: currentUser,
+      token,
+      isAuthenticated: !!token && !!currentUser,
+      isLoading: isLoading || isCurrentUserLoading,
+      refetchUser: refetch,
+      logout,
+      setAuthFromRedirect,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUser, isCurrentUserLoading, isLoading, token]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
@@ -119,8 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+
   return context;
 };

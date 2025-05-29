@@ -20,12 +20,24 @@ export class FollowService {
     return await this.followRepository.find();
   }
 
+  async getAllByFollower(followerId: string): Promise<FollowEntity[]> {
+    return await this.followRepository.find({
+      where: { follower: { id: followerId } },
+    });
+  }
+
+  async getAllByFollowing(followingId: string): Promise<FollowEntity[]> {
+    return await this.followRepository.find({
+      where: { following: { id: followingId } },
+    });
+  }
+
   async createOne(
     followingId: string,
     follower: UserEntity,
   ): Promise<FollowEntity> {
     if (followingId === follower.id)
-      throw new BadRequestException('You can not follow yourself');
+      throw new BadRequestException(['You can not follow yourself']);
 
     try {
       const follow = this.followRepository.create({

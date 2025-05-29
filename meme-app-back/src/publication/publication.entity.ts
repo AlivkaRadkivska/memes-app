@@ -1,6 +1,7 @@
 import { Exclude, Transform } from 'class-transformer';
 import { IsIn, IsInt } from 'class-validator';
 import { CommentEntity } from 'src/comment/comment.entity';
+import { FollowEntity } from 'src/follow/follow.entity';
 import { LikeEntity } from 'src/like/like.entity';
 import { UserEntity } from 'src/user/user.entity';
 import {
@@ -30,6 +31,7 @@ export class PublicationEntity {
   @Transform(({ value }) => {
     return {
       id: value.id,
+      avatar: value.avatar,
       username: value.username,
       fullName: value.fullName,
       email: value.email,
@@ -49,7 +51,7 @@ export class PublicationEntity {
   lastUpdatedAt: Date;
 
   @Column()
-  @IsIn(['active', 'hidden', 'draft'])
+  @IsIn(['active', 'hidden'])
   status: string;
 
   @Column({ name: 'is_banned', default: false })
@@ -80,6 +82,7 @@ export class PublicationEntity {
   commentCount: number;
 
   isLiked: boolean;
+  isFollowing: boolean;
 
   @AfterLoad()
   getCounts(): void {
@@ -94,5 +97,18 @@ export class PublicationEntity {
     }
 
     this.isLiked = this.likes.some((like) => like.user?.id === user.id);
+  }
+
+  setIsFollowing(user?: Partial<UserEntity>, follows?: FollowEntity[]): void {
+    if (!user || !follows) {
+      this.isFollowing = false;
+      return;
+    }
+
+    this.isFollowing = follows.some(
+      (follow) =>
+        follow.follower?.id === user.id &&
+        follow.following?.id === this.author.id,
+    );
   }
 }

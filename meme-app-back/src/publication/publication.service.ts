@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedDataDto } from 'src/common-dto/paginated-data.dto';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
+import { FollowEntity } from 'src/follow/follow.entity';
+import { FollowService } from 'src/follow/follow.service';
 import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePublicationDto } from './dto/create-publication.dto';
@@ -15,6 +17,7 @@ export class PublicationService {
     @InjectRepository(PublicationEntity)
     private publicationRepository: Repository<PublicationEntity>,
     private fileUploadService: FileUploadService,
+    private followService: FollowService,
   ) {}
 
   async getAll(
@@ -27,6 +30,15 @@ export class PublicationService {
       .leftJoinAndSelect('likes.user', 'likeUser')
       .leftJoinAndSelect('publication.comments', 'comments')
       .leftJoinAndSelect('publication.author', 'author');
+
+    if (filters?.onlyFollowing && user) {
+      query.innerJoin(
+        FollowEntity,
+        'follow',
+        'follow.following = publication.author AND follow.follower = :userId',
+        { userId: user.id },
+      );
+    }
 
     if (filters?.keywords && filters.keywords.length > 0) {
       query.andWhere(
@@ -45,12 +57,6 @@ export class PublicationService {
       });
     }
 
-    if (filters?.isBanned !== undefined) {
-      query.andWhere('publication.isBanned = :isBanned', {
-        isBanned: filters.isBanned,
-      });
-    }
-
     if (filters?.search) {
       query.andWhere(
         '(LOWER(publication.description) LIKE LOWER(:search) OR EXISTS (SELECT 1 FROM unnest(publication.keywords) keyword WHERE LOWER(keyword) LIKE LOWER(:search)))',
@@ -65,12 +71,18 @@ export class PublicationService {
       );
     }
 
+    if (filters?.authorId) {
+      query.andWhere('author.id = :authorId', {
+        authorId: filters.authorId,
+      });
+    }
+
     if (filters?.createdAtDesc !== undefined) {
       query.orderBy(
         'publication.createdAt',
         filters.createdAtDesc ? 'DESC' : 'ASC',
       );
-    }
+    } else query.orderBy('publication.createdAt', 'DESC');
 
     const limit = Number(filters?.limit) || 3;
     const page = Number(filters?.page) || 1;
@@ -79,7 +91,13 @@ export class PublicationService {
     query.take(limit).skip(offset);
 
     const [publications, total] = await query.getManyAndCount();
-    publications.forEach((publication) => publication.setIsLiked(user));
+    const follows =
+      user && (await this.followService.getAllByFollower(user.id));
+
+    publications.forEach((publication) => {
+      publication.setIsLiked(user);
+      publication.setIsFollowing(user, follows);
+    });
 
     return {
       items: publications,
@@ -96,7 +114,8 @@ export class PublicationService {
       where: { id, author: { id: authorId } },
     });
 
-    if (!publication) throw new NotFoundException('Publication was not found');
+    if (!publication)
+      throw new NotFoundException(['Publication was not found']);
 
     return publication;
   }

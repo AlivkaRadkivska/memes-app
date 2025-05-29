@@ -13,7 +13,10 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  fullName: string;
+  fullName?: string;
+
+  @IsOptional()
+  signature?: string;
 
   @IsOptional()
   @IsDate()

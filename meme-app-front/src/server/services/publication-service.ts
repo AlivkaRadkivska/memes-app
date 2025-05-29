@@ -46,3 +46,36 @@ export const publishMemes = async (
   });
   return response.data;
 };
+
+export const likePublication = async (publicationId: string): Promise<void> => {
+  const response = await axiosInstance.post(`/like/${publicationId}`);
+  return response.data;
+};
+
+export const dislikePublication = async (
+  publicationId: string
+): Promise<void> => {
+  const response = await axiosInstance.delete(`/like/${publicationId}`);
+  return response.data;
+};
+
+export const hidePublication = async (publicationId: string): Promise<void> => {
+  const response = await axiosInstance.patch(`/publication/${publicationId}`, {
+    status: 'hidden',
+  });
+  return response.data;
+};
+
+export const showPublication = async (publicationId: string): Promise<void> => {
+  const response = await axiosInstance.patch(`/publication/${publicationId}`, {
+    status: 'active',
+  });
+  return response.data;
+};
+
+export const deleteOnePublication = async (
+  publicationId: string
+): Promise<void> => {
+  const response = await axiosInstance.delete(`/publication/${publicationId}`);
+  return response.data;
+};

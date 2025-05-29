@@ -21,3 +21,9 @@ export function base64ToFile(
   const byteArray = new Uint8Array(byteNumbers);
   return new File([byteArray], filename, { type, lastModified: Date.now() });
 }
+
+export async function linkToBlob(pictureLink: string) {
+  const response = await fetch(pictureLink, { mode: 'cors' });
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
+}

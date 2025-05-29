@@ -59,6 +59,29 @@
   }
 }
 
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #fff;
+  border-radius: 20px;
+  border: 2px solid #000;
+  width: 10px;
+}
+
+*::-webkit-scrollbar-thumb:horizontal {
+  background-color: #fff;
+  border-radius: 20px;
+  border: 2px solid #000;
+  height: 10px;
+}
+
 @layer base {
   * {
     @apply border-border;

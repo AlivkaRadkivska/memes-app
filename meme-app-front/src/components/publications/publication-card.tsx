@@ -14,88 +14,209 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/helpers/css-utils';
+import { linkToBlob } from '@/helpers/file-utils';
+import { formatCount, formatDate } from '@/helpers/publication-utils';
+import useDeletePublication from '@/server/hooks/publications/use-delete';
+import useLike from '@/server/hooks/publications/use-like';
+import useTogglePublicationStatus from '@/server/hooks/publications/use-toggle-status';
+import useFollow from '@/server/hooks/follows/use-follow';
 import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   EllipsisVertical,
+  EyeOff,
   Heart,
+  HeartHandshake,
   LoaderCircle,
-  MessageSquare,
+  PawPrint,
   Triangle,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { useDebouncedCallback } from 'use-debounce';
+import { CommentSection } from '../comments/comment-section';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
   DialogOverlay,
   DialogTitle,
 } from '../ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Separator } from '../ui/separator';
 
 interface PublicationCardProps {
   publication: Publication;
-  onLike: (id: string) => void;
-  onComment: (id: string) => void;
 }
 
-const formatCount = (count: number) =>
-  count >= 1_000_000_000
-    ? Math.round(count / 1_000_000_000) + 'B'
-    : count >= 1_000_000
-    ? Math.round(count / 1_000_000) + 'M'
-    : count >= 1_000
-    ? Math.round(count / 1_000) + 'K'
-    : count;
-
 export const PublicationCard: React.FC<PublicationCardProps> = ({
-  publication,
-  onLike,
-  onComment,
-}) => {
-  const [isDescCollapsed, setIsDescCollapsed] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  const {
+  publication: {
     id,
     pictures,
     description,
     keywords,
     author,
-    isLiked,
     likeCount,
     commentCount,
-    isBanned,
-    banReason,
-  } = publication;
+    isLiked,
+    isFollowing,
+    createdAt,
+    status,
+  },
+}) => {
+  const [isDescCollapsed, setIsDescCollapsed] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
+  const { deletePublication, isPending: isPendingDelete } =
+    useDeletePublication();
+  const { like, isPending: isPendingLike } = useLike();
+  const { follow, isPending: isPendingFollow } = useFollow();
+  const { togglePublicationStatus, isPending: isPendingStatus } =
+    useTogglePublicationStatus();
+
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const isMine = user?.id === author.id;
+
+  const handleLikeDebounced = useDebouncedCallback(
+    () => like({ publicationId: id, isLiked }),
+    300
+  );
+
+  const handleFollow = () => {
+    follow({ followingId: author.id, isFollowed: isFollowing });
+  };
+
+  const handleExport = async () => {
+    try {
+      pictures.forEach(async (picture, index) => {
+        const blobUrl = await linkToBlob(picture);
+
+        if (linkRef.current) {
+          linkRef.current.href = blobUrl;
+          linkRef.current.download = `${description.slice(0, 10)}_${index}.png`;
+          linkRef.current.click();
+
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 600);
+        }
+      });
+    } catch (err) {
+      toast('Щось пішло не так...');
+      console.error('Failed to fetch and download image:', err);
+    }
+  };
+
+  const handleDelete = () => {
+    if (confirmDelete) {
+      deletePublication(id);
+      setConfirmDelete(false);
+    }
+  };
 
   return (
-    <>
-      <Card className="flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-x-0 p-0">
+    <div className="w-full h-full">
+      <Card
+        className={cn(
+          'flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0',
+          status === 'hidden' && 'brightness-75 dark:brightness-50'
+        )}
+        onDoubleClick={handleLikeDebounced}
+      >
         <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
-          <div className="flex gap-2 items-start py-1 px-3 rounded-br-md">
+          <div
+            className="flex gap-2 items-start py-1 px-3 rounded-br-md cursor-pointer"
+            onClick={() => router.push(`/profile/${author.email}`)}
+          >
             <Avatar className="w-16 h-16">
               <AvatarImage
-                src="https://github.com/shadcn.png"
-                alt={author.email}
+                src={author.avatar}
+                alt={author.username}
+                className="object-cover"
               />
-              <AvatarFallback>{author.username}</AvatarFallback>
+              <AvatarFallback>Ніц</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
-              <p className="font-semibold text-lg">
-                {author.fullName || author.username}
-              </p>
-              <p className="text-sm -mt-1">@{author.username}</p>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2 items-center">
+                <p className="font-semibold flex text-xl -mt-1">
+                  {author.username}
+                  {isFollowing && <PawPrint size={20} className="ml-1 -mt-1" />}
+                </p>
+              </div>
+              <p className="text-sm -mt-3">{author.email}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <Button variant="ghost" className="w-6">
-              <EllipsisVertical />
-            </Button>
+            <p className="text-sm -mt-1">{formatDate(createdAt)}</p>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="w-6">
+                  <EllipsisVertical size={16} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-min text-nowrap p-1 flex flex-col items-start"
+                align="end"
+              >
+                <Button
+                  variant="link"
+                  onClick={handleFollow}
+                  disabled={!isAuthenticated || isPendingFollow || isMine}
+                >
+                  {isFollowing ? 'Відписатися' : 'Підписатися'}
+                </Button>
+                <Separator />
+                <Button variant="link" onClick={handleExport}>
+                  Скачати меми собі
+                </Button>
+                <a ref={linkRef} className="hidden" />
+                {isMine && (
+                  <>
+                    <Separator />
+                    <Button
+                      variant="link"
+                      disabled={isPendingStatus}
+                      onClick={() =>
+                        togglePublicationStatus({ publicationId: id, status })
+                      }
+                    >
+                      {status === 'active' ? 'Сховати' : 'Опублікувати'}
+                    </Button>
+                    <Button
+                      variant="link"
+                      disabled={isPendingDelete}
+                      onClick={() => setConfirmDelete(true)}
+                    >
+                      Видалити
+                    </Button>
+                  </>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         </CardHeader>
 
-        <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8">
+        <CardContent className="w-full min-h-72 h-[calc(60vh-120px)] px-0 -mt-8 relative">
+          {status === 'hidden' && (
+            <EyeOff
+              size={80}
+              color="white"
+              className="bg-black/40 p-4 rounded-2xl absolute left-[50%] top-[50%] z-40 -ml-[40px] -mt-[40px]"
+            />
+          )}
           <Carousel className="w-full h-full">
             <CarouselContent className="w-full h-full">
               {pictures.map((picture) => (
@@ -124,65 +245,62 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         </CardContent>
 
         <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
-          {isBanned ? (
-            <p className="text-red-500 text-sm font-semibold">
-              Цей пост заборонений для перегляду. Причина: {banReason}
-            </p>
-          ) : (
-            <>
-              <div
+          <div
+            className={cn(
+              'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[90%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
+              isDescCollapsed ? 'max-h-10' : 'max-h-[500%]'
+            )}
+            style={{
+              transition:
+                'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
+            }}
+            onClick={() => setIsDescCollapsed((prev) => !prev)}
+          >
+            <Button variant="ghost" className="[&_svg]:size-4">
+              <Triangle
                 className={cn(
-                  'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[85%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
-                  isDescCollapsed ? 'max-h-12' : 'max-h-[500%]'
+                  'transition-all duration-500 ease-in-out',
+                  isDescCollapsed ? 'rotate-0' : 'rotate-[60deg]'
                 )}
-                style={{
-                  transition:
-                    'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
-                }}
-                onClick={() => setIsDescCollapsed((prev) => !prev)}
-              >
-                <Button variant="ghost" className="[&_svg]:size-4">
-                  <Triangle
-                    className={cn(
-                      'transition-all duration-500 ease-in-out',
-                      isDescCollapsed ? 'rotate-0' : 'rotate-180'
-                    )}
-                  />
-                </Button>
-                <div className="flex flex-col gap-5">
-                  <p className="mt-2">{description}</p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    #{keywords.join(' #')}
-                  </p>
-                </div>
-                <div
-                  className={cn(
-                    'absolute bottom-0 w-[120%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
-                    isDescCollapsed ? 'h-full ' : 'h-[150%]'
-                  )}
-                ></div>
-              </div>
+              />
+            </Button>
+            <div
+              className={cn(
+                'flex flex-col gap-5 w-full',
+                !isDescCollapsed ? 'overflow-y-auto' : 'overflow-hidden'
+              )}
+            >
+              <p className="mt-2 text-wrap">{description}</p>
+              <p className="mt-1 text-sm text-gray-500">
+                #{keywords.join(' #')}
+              </p>
+            </div>
+            <div
+              className={cn(
+                'absolute bottom-0 w-[150%] bg-gradient-to-b from-transparent to-background transition-all easy-in-out duration-500 to-50% -z-10',
+                isDescCollapsed ? 'h-full ' : 'h-[150%]'
+              )}
+            />
+          </div>
 
-              <div className="flex items-center mt-auto z-10">
-                <Button
-                  variant="ghost"
-                  onClick={() => onLike(id)}
-                  className={cn('flex items-center', isLiked && 'text-red-500')}
-                >
-                  <Heart size={18} /> {formatCount(likeCount)}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => onComment(id)}
-                  className="flex items-center"
-                >
-                  <MessageSquare size={18} /> {formatCount(commentCount)}
-                </Button>
-              </div>
-            </>
-          )}
+          <div className="flex items-center mt-auto z-10">
+            <Button
+              variant="ghost"
+              onClick={handleLikeDebounced}
+              className={cn(
+                'flex items-center [&_svg]:size-6',
+                isLiked && 'text-red-500'
+              )}
+              disabled={!isAuthenticated || isPendingLike}
+            >
+              {isLiked ? <HeartHandshake size={24} /> : <Heart size={24} />}
+              {formatCount(likeCount)}
+            </Button>
+          </div>
         </CardFooter>
       </Card>
+
+      <CommentSection publicationId={id} commentCount={commentCount} />
 
       <Dialog
         open={!!selectedImage}
@@ -205,7 +323,24 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
           )}
         </DialogContent>
       </Dialog>
-    </>
+
+      <AlertDialog open={confirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Точно видалити?</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ні</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
+              Так
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };
 
@@ -216,14 +351,14 @@ function ImageWithSkeleton({
   src: string;
   onClick: () => void;
 }) {
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <div
       className="relative w-full h-full flex items-center justify-center"
       onClick={onClick}
     >
-      {loading && (
+      {isLoading && (
         <Skeleton className="absolute top-0 right-0 inset-0 w-full h-full bg-background flex items-center justify-center z-10 animate-none">
           <LoaderCircle className="w-36 h-36 animate-spin duration-1000" />
         </Skeleton>
@@ -235,8 +370,8 @@ function ImageWithSkeleton({
         layout="fill"
         objectFit="contain"
         loading="lazy"
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
+        onLoad={() => setIsLoading(false)}
+        onError={() => setIsLoading(false)}
         style={{ cursor: 'pointer' }}
       />
     </div>

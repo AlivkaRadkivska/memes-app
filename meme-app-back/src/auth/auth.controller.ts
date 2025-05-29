@@ -1,14 +1,19 @@
 import {
   Body,
   Controller,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
+  ParseFilePipe,
   Post,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserEntity } from 'src/user/user.entity';
 import { AuthService } from './auth.service';
 import { AuthResultDto } from './dto/auth-result.dto';
@@ -30,11 +35,19 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FileInterceptor('avatar'))
   @Post('signup')
   signUp(
     @Body() signUpCredentialsDto: SignUpCredentialsDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'image/*' })],
+        fileIsRequired: false,
+      }),
+    )
+    picture: Express.Multer.File,
   ): Promise<AuthResultDto> {
-    return this.authService.signUp(signUpCredentialsDto);
+    return this.authService.signUp(signUpCredentialsDto, picture);
   }
 
   @HttpCode(HttpStatus.OK)

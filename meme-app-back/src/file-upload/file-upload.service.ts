@@ -20,7 +20,7 @@ export class FileUploadService {
 
   async uploadFiles(files: Express.Multer.File[]): Promise<string[]> {
     if (files.length < 1) {
-      throw new BadRequestException('No files provided');
+      throw new BadRequestException(['No files provided']);
     }
 
     const modifiedFiles = await Promise.all(
@@ -60,7 +60,7 @@ export class FileUploadService {
       })
       .toBuffer();
 
-    return new File([resizedBuffer], newName, {
+    return new File([resizedBuffer as BlobPart], newName, {
       type: file.mimetype,
     });
   }
