@@ -1,8 +1,19 @@
-import express from "express";
-import { GoogleGenAI } from "@google/genai";
+import express from 'express';
+import cors from 'cors';
+import { GoogleGenAI } from '@google/genai';
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS
+  ? process.env.CORS_ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000', 'http://localhost:3001'];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
 
 app.use(express.json());
 
@@ -15,27 +26,27 @@ interface AiImageResponse {
   base64: string;
 }
 
-app.post("/api/ai-image", async (req, res) => {
+app.post('/api/ai-image', async (req, res) => {
   try {
     const { prompt }: { prompt: string } = req.body || {};
 
     if (!prompt) {
-      res.status(400).json({ error: "Prompt is required" });
+      res.status(400).json({ error: 'Prompt is required' });
       return;
     }
 
     const config = {
-      responseModalities: ["IMAGE", "TEXT"],
-      responseMimeType: "text/plain",
+      responseModalities: ['IMAGE', 'TEXT'],
+      responseMimeType: 'text/plain',
     };
 
-    const model = "gemini-2.0-flash-preview-image-generation";
+    const model = 'gemini-2.0-flash-preview-image-generation';
     const contents = [
       {
-        role: "user",
+        role: 'user',
         parts: [
           {
-            data: "",
+            data: '',
             text: `Generate an image according to this description: ${prompt}`,
           },
         ],
@@ -61,11 +72,11 @@ app.post("/api/ai-image", async (req, res) => {
       }
     }
 
-    res.status(500).json({ error: "No image data returned" });
+    res.status(500).json({ error: 'No image data returned' });
     return;
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Image generation failed" });
+    res.status(500).json({ error: 'Image generation failed' });
     return;
   }
 });
