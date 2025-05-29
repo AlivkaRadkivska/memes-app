@@ -16,11 +16,12 @@ export interface User {
   isFollowing: boolean;
 }
 
-export interface FollowResponse {
+export interface MiniUser {
   id: string;
-  startFollowingAt: Date;
-  follower: { id: string; email: string };
-  following: { id: string };
+  avatar: string;
+  username: string;
+  fullName: string;
+  email: string;
 }
 
 export interface UserUpdatePayload {

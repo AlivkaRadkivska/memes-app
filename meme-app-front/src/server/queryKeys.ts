@@ -15,6 +15,8 @@ const getUser = (params?: { email?: string; id?: string }) => [
   'get-user',
   params,
 ];
+const getFollowers = () => ['get-followers'];
+const getFollowings = () => ['get-followings'];
 
 export const queryKeys = {
   getPublications,
@@ -22,4 +24,6 @@ export const queryKeys = {
   getComments,
   getCurrentUser,
   getUser,
+  getFollowers,
+  getFollowings,
 } as const;

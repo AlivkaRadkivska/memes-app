@@ -21,7 +21,7 @@ import { formatCount, formatDate } from '@/helpers/publication-utils';
 import useDeletePublication from '@/server/hooks/publications/use-delete';
 import useLike from '@/server/hooks/publications/use-like';
 import useTogglePublicationStatus from '@/server/hooks/publications/use-toggle-status';
-import useFollow from '@/server/hooks/users/use-follow';
+import useFollow from '@/server/hooks/follows/use-follow';
 import { Publication } from '@/server/types/publication';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {

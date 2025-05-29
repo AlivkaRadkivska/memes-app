@@ -24,6 +24,18 @@ export class FollowController {
     return this.followService.getAll();
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Get('/followers/:id')
+  getFollowers(@Param('id') id: string): Promise<FollowEntity[]> {
+    return this.followService.getAllByFollowing(id);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/followings/:id')
+  getFollowings(@Param('id') id: string): Promise<FollowEntity[]> {
+    return this.followService.getAllByFollower(id);
+  }
+
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
   @Post('/:followingId')
