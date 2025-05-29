@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+
+# Production build artifacts
+dist
+
+# Environment files
+.env*
+
+# IDE and editor files
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+.dockerignore
+compose.yaml
+
+# Documentation
+README.md
+
+# Test files
+test/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Nest.js specific
+.nest/
