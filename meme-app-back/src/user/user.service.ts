@@ -95,9 +95,10 @@ export class UserService {
 
     const follows =
       authUser && (await this.followService.getAllByFollower(authUser.id));
-    user.setIsFollowing(authUser, follows);
 
     if (!user) throw new NotFoundException(['Користувача не знайдено']);
+
+    user.setIsFollowing(authUser, follows);
 
     return user;
   }

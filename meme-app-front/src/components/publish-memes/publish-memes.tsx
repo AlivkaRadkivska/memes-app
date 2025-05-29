@@ -61,9 +61,9 @@ export default function PublishMemes() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 h-full">
+    <div className="flex flex-col max-w-7xl mx-auto space-y-8 h-full">
       <div className="border-none shadow-sm">
-        <div className="w-full pb-2">
+        <div className="w-full pb-2 flex-1">
           <div className="w-full gap-2 flex items-start justify-between">
             <h1 className="text-3xl font-bold">Меми для публікації</h1>
             <div className="flex gap-2 items-center">
@@ -126,7 +126,7 @@ export default function PublishMemes() {
       )}
 
       {noPhotos && (
-        <div className="w-full flex flex-col items-center justify-center py-12">
+        <div className="w-full flex flex-col items-center justify-center py-12 flex-1">
           {noPhotos && (
             <div className="text-lg text-muted-foreground">
               <p className="ml-8">мають бути ваші меми</p>

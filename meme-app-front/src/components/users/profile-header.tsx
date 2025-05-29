@@ -35,7 +35,7 @@ export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
   } = user;
 
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const { follow, isPending: isPendingFollow } = useFollow(user);
   const { followers } = useGetFollowers(user.id);
   const { followings } = useGetFollowings(user.id);
@@ -138,7 +138,7 @@ export function ProfileHeader({ user, me = false }: ProfileHeaderProps) {
             ) : (
               <Button
                 onClick={handleFollow}
-                disabled={isPendingFollow}
+                disabled={isPendingFollow || !isAuthenticated}
                 variant={isFollowing ? 'outline' : 'default'}
               >
                 {!isFollowing && <PawPrint />}

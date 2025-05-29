@@ -39,7 +39,7 @@ export function CommentSection({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="py-2 w-full">
       <CollapsibleTrigger asChild>
-        <div className="flex items-center justify-between z-10">
+        <div className="flex items-center justify-between z-10 cursor-pointer">
           <Button variant="ghost" className="[&_svg]:size-4">
             <Triangle
               className={cn(

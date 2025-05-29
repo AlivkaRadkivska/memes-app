@@ -25,7 +25,7 @@ export function UserSidebar({ className }: UserSidebarProps) {
     if (stored !== null) {
       setIsCollapsed(stored === 'true');
     } else {
-      setIsCollapsed(true); // fallback default
+      setIsCollapsed(true);
     }
   }, []);
 

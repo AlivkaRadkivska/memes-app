@@ -53,18 +53,6 @@ export function MiniProfile({ isCollapsed }: { isCollapsed: boolean }) {
       )}
 
       <Button
-        variant="default"
-        size={isCollapsed ? 'icon' : 'default'}
-        className={cn(
-          'w-full',
-          isCollapsed ? 'justify-center' : 'justify-start'
-        )}
-        onClick={() => router.push('/gallery')}
-      >
-        <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
-        {!isCollapsed && 'Підкинути мемчиків'}
-      </Button>
-      <Button
         variant="outline"
         size={isCollapsed ? 'icon' : 'default'}
         className={cn(
@@ -75,6 +63,18 @@ export function MiniProfile({ isCollapsed }: { isCollapsed: boolean }) {
       >
         <Pen className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
         {!isCollapsed && 'Змінити інфо'}
+      </Button>
+      <Button
+        variant="default"
+        size={isCollapsed ? 'icon' : 'default'}
+        className={cn(
+          'w-full',
+          isCollapsed ? 'justify-center' : 'justify-start'
+        )}
+        onClick={() => router.push('/gallery')}
+      >
+        <Plus className={cn('h-4 w-4', !isCollapsed && 'mr-2')} />
+        {!isCollapsed && 'Підкинути мемчиків'}
       </Button>
     </div>
   );
