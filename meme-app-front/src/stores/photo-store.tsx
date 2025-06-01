@@ -17,6 +17,7 @@ interface PhotoState {
   updatePhoto: (id: string, file: File, preview: string) => void;
   removePhoto: (id: string) => void;
   getPhoto: (id: string) => Photo | undefined;
+  clearPhotos: () => void;
 }
 
 const getPhotoMeta = async (
@@ -77,4 +78,5 @@ export const usePhotoStore = create<PhotoState>((set, get) => ({
       };
     }),
   getPhoto: (id) => get().photos.find((photo) => photo.id === id),
+  clearPhotos: () => set(() => ({ photos: [] })),
 }));

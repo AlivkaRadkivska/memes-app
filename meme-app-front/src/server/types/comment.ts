@@ -1,13 +1,11 @@
+import { MiniUser } from './user';
+
 export interface Comment {
   id: string;
   text: string;
   picture: string | null;
   createdAt: Date;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-  };
+  user: MiniUser;
   publication: string;
 }
 

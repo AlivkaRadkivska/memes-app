@@ -2,6 +2,7 @@ import { queryKeys } from '@/server/queryKeys';
 import { publishMemes } from '@/server/services/publication-service';
 import { CommonError } from '@/server/types/common';
 import { Publication, PublishMemesPayload } from '@/server/types/publication';
+import { usePhotoStore } from '@/stores/photo-store';
 import {
   useMutation,
   UseMutationOptions,
@@ -20,6 +21,8 @@ export default function usePublishMemes(
 ) {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { clearPhotos } = usePhotoStore();
+
   const { mutate: publish, isPending } = useMutation({
     mutationFn: (data) => publishMemes(data),
     onMutate: () => {
@@ -28,6 +31,7 @@ export default function usePublishMemes(
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.getPublications() });
       toast('Опубліковано!');
+      clearPhotos();
       router.push('/');
     },
     onError: (err) => {

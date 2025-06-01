@@ -20,22 +20,22 @@ export function usePublicationFilters(
 
     const params: Partial<PublicationFilters> = {};
 
-    if (!!searchParams.get('keywords'))
+    if (searchParams.get('keywords') != null)
       params.keywords = searchParams.get('keywords')!;
 
-    if (!!searchParams.get('search'))
+    if (searchParams.get('search') != null)
       params.search = searchParams.get('search')!;
 
-    if (!!searchParams.get('author'))
+    if (searchParams.get('author') != null)
       params.author = searchParams.get('author')!;
 
-    if (!!searchParams.get('createdAtDesc'))
+    if (searchParams.get('createdAtDesc') != null)
       params.createdAtDesc = getBoolean(searchParams.get('createdAtDesc'))!;
 
-    if (!!searchParams.get('limit'))
+    if (searchParams.get('limit') != null)
       params.limit = getNumber(searchParams.get('limit'))!;
 
-    if (!!searchParams.get('page'))
+    if (searchParams.get('page') != null)
       params.page = getNumber(searchParams.get('page'))!;
 
     setFilters((prev) => ({ ...prev, ...params }));

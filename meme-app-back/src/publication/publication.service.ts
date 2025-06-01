@@ -31,7 +31,7 @@ export class PublicationService {
       .leftJoinAndSelect('publication.comments', 'comments')
       .leftJoinAndSelect('publication.author', 'author');
 
-    if (filters?.onlyFollowing && user) {
+    if (filters?.onlyFollowing === 'true' && user) {
       query.innerJoin(
         FollowEntity,
         'follow',
@@ -80,7 +80,7 @@ export class PublicationService {
     if (filters?.createdAtDesc !== undefined) {
       query.orderBy(
         'publication.createdAt',
-        filters.createdAtDesc ? 'DESC' : 'ASC',
+        filters.createdAtDesc === 'true' ? 'DESC' : 'ASC',
       );
     } else query.orderBy('publication.createdAt', 'DESC');
 

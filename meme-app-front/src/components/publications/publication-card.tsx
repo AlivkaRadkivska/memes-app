@@ -134,7 +134,6 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
           'flex flex-col justify-center items-center w-full min-h-72 h-[60vh] border-muted-foreground border-x-0 border-b-muted p-0',
           status === 'hidden' && 'brightness-75 dark:brightness-50'
         )}
-        onDoubleClick={handleLikeDebounced}
       >
         <CardHeader className="w-full flex flex-row justify-between items-start p-0 py-2 z-10">
           <div

@@ -9,13 +9,13 @@ import { PublicationGrid } from './profile-publications';
 
 export default function Profile({ email }: { email: string }) {
   const router = useRouter();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, isAuthenticated } = useAuth();
   const { user, isInitialFetching } = useGetUser(email);
 
   useEffect(() => {
-    if (user && currentUser && user.id === currentUser.id)
+    if (isAuthenticated && user && currentUser && user.id === currentUser.id)
       router.push('/my-profile');
-  }, [currentUser, router, user]);
+  }, [currentUser, isAuthenticated, router, user]);
 
   if (isInitialFetching) return <p>Loading</p>;
 
