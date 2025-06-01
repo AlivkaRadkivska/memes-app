@@ -9,6 +9,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { toast } from 'sonner';
 import { v4 as uuid } from 'uuid';
 
 export default function useGenerateImage(
@@ -42,6 +43,7 @@ export default function useGenerateImage(
     },
     onError: (err) => {
       console.error('API Error:', err);
+      toast('Щось пішло не так...');
     },
     ...options,
   });

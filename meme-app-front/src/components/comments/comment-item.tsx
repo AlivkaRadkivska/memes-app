@@ -51,11 +51,11 @@ export function CommentItem({
             <div className="flex flex-col gap-2">
               <Avatar className="w-9 h-9">
                 <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt={user.email}
+                  src={user.avatar}
+                  alt={user.username}
                   className="object-cover"
                 />
-                <AvatarFallback>{user.username}</AvatarFallback>
+                <AvatarFallback>Ніц</AvatarFallback>
               </Avatar>
 
               {user.email === authenticatedUser?.email && (

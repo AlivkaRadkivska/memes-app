@@ -9,12 +9,15 @@ import {
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
+import { usePublicationFilters } from '../publications/use-publication-filters';
 
 export default function useAddComment(
   passingFilters?: Partial<CommentFilters>,
   options?: UseMutationOptions<void, AxiosError<CommonError>, CommentPayload>
 ) {
   const queryClient = useQueryClient();
+  const { filters } = usePublicationFilters();
+
   const { mutate: addComment, isPending } = useMutation({
     mutationFn: (data) => commentPublication(data),
     onMutate: () => toast('Коментар додається...'),
@@ -22,6 +25,9 @@ export default function useAddComment(
       toast('Коментар додано');
       queryClient.invalidateQueries({
         queryKey: queryKeys.getComments(passingFilters),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.getPublications(filters),
       });
     },
     onError: (err) => {
