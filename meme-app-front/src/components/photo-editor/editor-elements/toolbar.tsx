@@ -44,7 +44,7 @@ export function Toolbar() {
 
   return (
     <div
-      className="w-14 border-r bg-card flex flex-col items-center py-4 gap-2"
+      className="w-14 border-r bg-card flex flex-row md:flex-col items-center py-4 gap-2"
       onClick={() => setSelectedObjectId(null)}
     >
       <TooltipProvider delayDuration={300}>

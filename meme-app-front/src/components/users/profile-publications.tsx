@@ -49,7 +49,7 @@ export function PublicationGrid({ userId, me = false }: PublicationGridProps) {
       />
 
       {isEmpty && <p>Ніц</p>}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {data?.pages.flatMap((page) =>
           page.items.map((publication) => (
             <PublicationCard key={publication.id} publication={publication} />

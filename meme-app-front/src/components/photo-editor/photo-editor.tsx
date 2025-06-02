@@ -19,7 +19,7 @@ export default function PhotoEditor({ id }: { id: string }) {
     <>
       <ActionsBar photoId={id} />
 
-      <div className="flex flex-1 px-4 py-0 sm:px-0">
+      <div className="flex flex-col md:flex-row flex-1 px-4 py-0 sm:px-0 flex-wrap">
         <Toolbar />
         <main className="flex flex-1 relative items-center justify-center">
           <EditorCanvas photoId={id} />

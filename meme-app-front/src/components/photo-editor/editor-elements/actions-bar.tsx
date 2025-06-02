@@ -17,7 +17,7 @@ export function ActionsBar({ photoId }: ActionsBarProps) {
   const canRedo = currentHistoryIndex < history.length - 1;
 
   return (
-    <div className="h-14 flex items-center gap-2 px-4 border-b">
+    <div className="h-28 md:h-14 flex items-center justify-center gap-2 px-4 border-b flex-wrap md:flex-nowrap">
       <Button
         variant="outline"
         onClick={() => {
@@ -47,7 +47,7 @@ export function ActionsBar({ photoId }: ActionsBarProps) {
         <Redo2 size={16} />
       </Button>
 
-      <div className="flex gap-2 ml-auto">
+      <div className="flex gap-2 md:ml-auto">
         <ExportButton photoId={photoId} />
       </div>
     </div>

@@ -14,7 +14,7 @@ export function MiniProfilePlaceholder({
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
+    <div className="flex flex-col items-center gap-4 p-2 md:p-4">
       <Avatar
         className={cn(
           'transition-all duration-300 ease-in-out cursor-pointer',

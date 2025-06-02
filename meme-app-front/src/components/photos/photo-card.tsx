@@ -71,13 +71,13 @@ export default function PhotoCard({
                 AI
               </p>
             )}
-            <div className="absolute inset-0 h-min opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-4">
+            <div className="absolute inset-0 h-min duration-200 flex flex-col items-center justify-center gap-4">
               {onEdit && (
                 <Button
                   size="icon"
                   variant="default"
                   onClick={onEdit}
-                  className="bg-white/70 text-black hover:bg-black/70 hover:text-white flex items-center gap-1 absolute top-1 left-1 px-3 w-max "
+                  className="bg-white text-black hover:bg-black hover:text-white flex items-center gap-1 absolute top-1 left-1 px-3 w-max "
                 >
                   <Edit2 size={14} />
                   Редагувати

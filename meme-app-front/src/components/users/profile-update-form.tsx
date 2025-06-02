@@ -71,7 +71,7 @@ export default function UserUpdateForm() {
   if (!isLoading && !user) return <p>Not found</p>;
 
   return (
-    <div className="w-full flex flex-col justify-start items-center">
+    <div className="w-full flex flex-col justify-start items-center p-2">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
