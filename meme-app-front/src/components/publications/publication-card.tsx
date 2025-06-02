@@ -140,7 +140,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             className="flex gap-2 items-start py-1 px-3 rounded-br-md cursor-pointer"
             onClick={() => router.push(`/profile/${author.email}`)}
           >
-            <Avatar className="w-16 h-16">
+            <Avatar className="w-10 h-10 md:w-16 md:h-16">
               <AvatarImage
                 src={author.avatar}
                 alt={author.username}
@@ -148,21 +148,25 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               />
               <AvatarFallback>Ніц</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 overflow-hidden ">
               <div className="flex gap-2 items-center">
-                <p className="font-semibold flex text-xl -mt-1">
+                <p className="font-semibold flex text-xl -mt-1 max-w-[100%] overflow-hidden text-ellipsis">
                   {author.username}
-                  {isFollowing && <PawPrint size={20} className="ml-1 -mt-1" />}
+                  {isFollowing && <PawPrint size={20} className="ml-1 mt-1" />}
                 </p>
               </div>
-              <p className="text-sm -mt-3">{author.email}</p>
+              <p className="text-xs md:text-sm -mt-3 max-w-[100%] overflow-hidden text-ellipsis">
+                {author.email}
+              </p>
             </div>
           </div>
           <div className="flex items-center">
-            <p className="text-sm -mt-1">{formatDate(createdAt)}</p>
+            <p className="text-nowrap text-xs md:text-sm -mt-[10px]">
+              {formatDate(createdAt)}
+            </p>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" className="w-6">
+                <Button variant="ghost" className="w-6 -mt-3">
                   <EllipsisVertical size={16} />
                 </Button>
               </PopoverTrigger>
@@ -246,7 +250,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
         <CardFooter className="w-full justify-end h-12 p-1 align-top relative">
           <div
             className={cn(
-              'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[90%] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
+              'absolute left-0 bottom-0 flex bg-background bg-opacity-70 w-[calc(100%-60px)] z-10 gap-2 transition-all ease-in-out duration-500 cursor-pointer ',
               isDescCollapsed ? 'max-h-10' : 'max-h-[500%]'
             )}
             style={{
@@ -255,7 +259,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
             }}
             onClick={() => setIsDescCollapsed((prev) => !prev)}
           >
-            <Button variant="ghost" className="[&_svg]:size-4">
+            <Button variant="ghost" className="p-2 [&_svg]:size-4">
               <Triangle
                 className={cn(
                   'transition-all duration-500 ease-in-out',
@@ -287,7 +291,7 @@ export const PublicationCard: React.FC<PublicationCardProps> = ({
               variant="ghost"
               onClick={handleLikeDebounced}
               className={cn(
-                'flex items-center [&_svg]:size-6',
+                'flex items-center p-2 [&_svg]:size-6',
                 isLiked && 'text-red-500'
               )}
               disabled={!isAuthenticated || isPendingLike}

@@ -21,7 +21,7 @@ export function SearchInput() {
   return (
     <div className="relative flex items-center gap-2 w-full">
       <div
-        className={`duration-300 absolute -top-4 mt-2 flex items-center p-2 gap-3 w-96 max-w-none border-l bg-background ${
+        className={`duration-300 absolute -top-4 mt-2 flex items-center p-2 gap-3 w-[100vw-25px] md:w-96 max-w-none border-l bg-background ${
           expanded ? 'right-10 z-40' : 'opacity-0 -z-10 border-none right-0'
         }`}
       >

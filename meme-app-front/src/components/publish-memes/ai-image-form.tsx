@@ -19,9 +19,11 @@ export default function AiImageForm({ isDisabled }: { isDisabled: boolean }) {
       ) : (
         <Bot className="w-12 h-12 text-muted-foreground mb-3" />
       )}
-      <p className="text-xl font-medium">Додати зображення згенероване Ai</p>
+      <p className="text-xl font-medium text-center">
+        Додати зображення згенероване Ai
+      </p>
       <p className="text-muted-foreground mb-2">Gemini, якщо точніше</p>
-      <div className="w-full flex gap-2 justify-center items-center mt-4">
+      <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center mt-4">
         <Input
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}

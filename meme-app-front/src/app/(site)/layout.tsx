@@ -9,7 +9,7 @@ export default function SiteLayout({
   return (
     <>
       <Header />
-      <main className="max-w-7xl mx-auto mt-14">{children}</main>
+      <main className="max-w-7xl mx-auto mt-20 md:mt-14">{children}</main>
       <Toaster />
     </>
   );

@@ -35,7 +35,7 @@ export default function PublishMemes() {
   }
 
   const noPhotos = !photos || photos.length < 1;
-  const isLimitReached = photos.length >= 8;
+  const isLimitReached = photos.length > 8;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -63,41 +63,45 @@ export default function PublishMemes() {
   return (
     <div className="flex flex-col max-w-7xl mx-auto space-y-8 h-full">
       <div className="border-none shadow-sm">
-        <div className="w-full pb-2 flex-1">
-          <div className="w-full gap-2 flex items-start justify-between">
+        <div className="w-full gap-2 flex items-start justify-between flex-wrap md:flex-nowrap">
+          <div>
             <h1 className="text-3xl font-bold">Меми для публікації</h1>
-            <div className="flex gap-2 items-center">
-              <Button
-                variant="outline"
-                onClick={!isLimitReached ? handleUpload : undefined}
-                disabled={isLimitReached || isPublishing}
-              >
-                <ImagePlus className="w-8 h-8" />
-                Завантажити своє
-              </Button>
-              {!noPhotos && (
-                <Button
-                  variant="secondary"
-                  onClick={
-                    !isLimitReached || isPublishing
-                      ? form.handleSubmit(onSubmit)
-                      : undefined
-                  }
-                  disabled={isPublishing}
-                >
-                  Додати собі меми
-                </Button>
-              )}
-            </div>
+            {isLimitReached ? (
+              <p className="text-destructive">
+                Можна публікувати максимум 8 зображень, тому деякі треба
+                видалити
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                Давай сюди, але не більше 8
+              </p>
+            )}
           </div>
-          {photos.length > 8 ? (
-            <p className="text-destructive">
-              Можна публікувати максимум 8 зображень, тому деякі треба видалити
-            </p>
-          ) : (
-            <p className="text-muted-foreground">Давай сюди, але не більше 8</p>
-          )}
+          <div className="flex gap-2 items-center flex-wrap">
+            <Button
+              variant="outline"
+              onClick={!isLimitReached ? handleUpload : undefined}
+              disabled={isLimitReached || isPublishing}
+            >
+              <ImagePlus className="w-8 h-8" />
+              Завантажити своє
+            </Button>
+            {!noPhotos && (
+              <Button
+                variant="secondary"
+                onClick={
+                  !isLimitReached || isPublishing
+                    ? form.handleSubmit(onSubmit)
+                    : undefined
+                }
+                disabled={isPublishing}
+              >
+                Опублікувати меми
+              </Button>
+            )}
+          </div>
         </div>
+
         <div>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
             <div className="flex gap-2 w-full sm:w-auto">
@@ -119,7 +123,7 @@ export default function PublishMemes() {
           <PublicationDetailsForm
             form={form}
             onSubmit={form.handleSubmit(onSubmit)}
-            isDisabled={isLimitReached || isPublishing}
+            isDisabled={photos.length > 9 || isPublishing}
           />
           <Gallery />
         </>
@@ -128,7 +132,7 @@ export default function PublishMemes() {
       {noPhotos && (
         <div className="w-full flex flex-col items-center justify-center py-12 flex-1">
           {noPhotos && (
-            <div className="text-lg text-muted-foreground">
+            <div className="text-lg text-muted-foreground text-center">
               <p className="ml-8">мають бути ваші меми</p>
               <p>
                 Тут <span className="line-through">може бути ваша реклама</span>

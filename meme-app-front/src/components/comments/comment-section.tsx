@@ -40,7 +40,7 @@ export function CommentSection({
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="py-2 w-full">
       <CollapsibleTrigger asChild>
         <div className="flex items-center justify-between z-10 cursor-pointer">
-          <Button variant="ghost" className="[&_svg]:size-4">
+          <Button variant="ghost" className="p-2 [&_svg]:size-4">
             <Triangle
               className={cn(
                 'transition-all duration-500 ease-in-out',
@@ -48,7 +48,7 @@ export function CommentSection({
               )}
             />
           </Button>
-          <p className="flex items-center gap-1 px-2 italic">
+          <p className="flex items-center gap-1 px-2 italic text-sm md:text-md">
             Внизу коментарі ({formatCount(commentCount || 0)})
           </p>
         </div>

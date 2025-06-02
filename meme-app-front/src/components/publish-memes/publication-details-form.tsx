@@ -38,13 +38,13 @@ export function PublicationDetailsForm({
     <Form {...form}>
       <form
         onSubmit={onSubmit}
-        className="animate-in fade-in duration-500 flex gap-3 justify-stretch"
+        className="animate-in fade-in duration-500 flex gap-3 justify-stretch flex-wrap md:flex-nowrap space-y-0"
       >
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem className="space-y-2 transition-all w-full h-full">
+            <FormItem className="transition-all w-full md:h-full">
               <FormLabel className="text-base font-medium">Опис</FormLabel>
               <FormControl>
                 <div className="relative min-h-full">
