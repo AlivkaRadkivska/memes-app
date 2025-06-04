@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { TextAlign, useEditorStore } from '@/stores/editor-store';
-import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
+import { useEditorStore } from '@/stores/editor-store';
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -48,14 +47,6 @@ export function TextProperties() {
     }
   };
 
-  const handleAlignChange = (align: TextAlign) => {
-    if (selectedObject) {
-      updateObject(selectedObject.id, { align });
-    } else {
-      setTextOptions({ align });
-    }
-  };
-
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newText = e.target.value;
     setText(newText);
@@ -83,16 +74,15 @@ export function TextProperties() {
   const displayValue = selectedObject?.text || text;
   const displayFontSize = selectedObject?.fontSize || textOptions.fontSize;
   const displayColor = selectedObject?.fill || textOptions.fill;
-  const displayAlign = selectedObject?.align || textOptions.align;
 
   return (
     <div className="p-4 space-y-4">
       {mode === 'text' && !selectedObject && (
         <div className="pb-4">
-          <h3 className="font-medium mb-2">Add New Text</h3>
+          <h3 className="font-medium mb-2">Текст</h3>
           <div className="space-y-3">
             <div>
-              <Label htmlFor="textContent">Text Content</Label>
+              <Label htmlFor="textContent">Текст</Label>
               <Input
                 id="textContent"
                 value={displayValue as string}
@@ -101,7 +91,7 @@ export function TextProperties() {
               />
             </div>
             <Button onClick={handleAddText} className="w-full mt-2">
-              Add Text
+              Додати текст
             </Button>
           </div>
         </div>
@@ -109,7 +99,7 @@ export function TextProperties() {
 
       <div className="space-y-4">
         <div>
-          <Label>Font Size: {displayFontSize as number}px</Label>
+          <Label>Розмір шрифту: {displayFontSize as number}px</Label>
           <Slider
             min={8}
             max={72}
@@ -121,7 +111,7 @@ export function TextProperties() {
         </div>
 
         <div>
-          <Label htmlFor="textColor">Color</Label>
+          <Label htmlFor="textColor">Коліп</Label>
           <div className="flex gap-2 mt-1">
             <div className="border rounded w-10 h-10 overflow-hidden">
               <input
@@ -142,7 +132,7 @@ export function TextProperties() {
 
         {selectedObject && (
           <div>
-            <Label htmlFor="textContent">Text Content</Label>
+            <Label htmlFor="textContent">Вміст тексту</Label>
             <Input
               id="textContent"
               value={displayValue as string}
@@ -151,36 +141,6 @@ export function TextProperties() {
             />
           </div>
         )}
-
-        <div>
-          <Label className="mb-2 block">Text Alignment</Label>
-          <div className="flex gap-2">
-            <Button
-              variant={displayAlign === 'left' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleAlignChange('left')}
-              className="flex-1"
-            >
-              <AlignLeft size={16} />
-            </Button>
-            <Button
-              variant={displayAlign === 'center' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleAlignChange('center')}
-              className="flex-1"
-            >
-              <AlignCenter size={16} />
-            </Button>
-            <Button
-              variant={displayAlign === 'right' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleAlignChange('right')}
-              className="flex-1"
-            >
-              <AlignRight size={16} />
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );

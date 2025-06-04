@@ -22,10 +22,9 @@ export function CropPanel() {
   return (
     <div className="p-4 space-y-6">
       <div>
-        <h3 className="font-medium mb-2">Crop Image</h3>
+        <h3 className="font-medium mb-2">Обрізати зображення</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Adjust the crop area by dragging the corners of the selection
-          rectangle.
+          Відрегулюйте область обрізання, перетягнувши кути виділення.
         </p>
       </div>
 
@@ -40,11 +39,11 @@ export function CropPanel() {
               <Label>Crop Dimensions</Label>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="bg-secondary p-2 rounded-md">
-                  <span className="text-muted-foreground">Width:</span>{' '}
+                  <span className="text-muted-foreground">Ширина:</span>{' '}
                   {Math.round(cropConfig.width)}px
                 </div>
                 <div className="bg-secondary p-2 rounded-md">
-                  <span className="text-muted-foreground">Height:</span>{' '}
+                  <span className="text-muted-foreground">Висота:</span>{' '}
                   {Math.round(cropConfig.height)}px
                 </div>
               </div>

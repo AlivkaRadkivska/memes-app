@@ -88,14 +88,14 @@ export function EmojisPanel() {
   return (
     <div className="p-4 space-y-4">
       <div>
-        <h3 className="font-medium mb-1">Add Emojis</h3>
+        <h3 className="font-medium mb-1">Додати емоджі</h3>
         <p className="text-sm text-muted-foreground mb-2">
-          Click on an emoji to add it to your image
+          Тицьніть на емоджі, щоб додати
         </p>
       </div>
 
       <div>
-        <Label>Emoji Size: {emojiSize}px</Label>
+        <Label>Розмір: {emojiSize}px</Label>
         <Slider
           min={20}
           max={120}

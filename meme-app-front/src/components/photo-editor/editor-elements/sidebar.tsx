@@ -39,7 +39,7 @@ export function Sidebar() {
 
     return (
       <div className="p-4 text-center text-muted-foreground">
-        <p>Select a tool or an object to edit its properties</p>
+        <p>Виберіть інструмент або об&apos;єкт для редагування</p>
       </div>
     );
   };
@@ -47,7 +47,7 @@ export function Sidebar() {
   return (
     <div className="w-64 border-l bg-card flex flex-col">
       <div className="p-4 border-b">
-        <h3 className="font-medium">Properties</h3>
+        <h3 className="font-medium">Властивості</h3>
       </div>
 
       <div className="overflow-y-auto">{renderPanel()}</div>
@@ -60,7 +60,7 @@ export function Sidebar() {
             className="w-full flex items-center gap-2"
           >
             <Trash2 size={16} />
-            Delete Object
+            Видалити
           </Button>
         </div>
       )}

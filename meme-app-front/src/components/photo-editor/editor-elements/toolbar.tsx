@@ -14,27 +14,27 @@ import { Crop, ImagePlus, MousePointer, Smile, Type } from 'lucide-react';
 const tools = [
   {
     id: 'select',
-    name: 'Select',
+    name: 'Фокус',
     icon: MousePointer,
   },
   {
     id: 'crop',
-    name: 'Crop',
+    name: 'Обрізати',
     icon: Crop,
   },
   {
     id: 'text',
-    name: 'Text',
+    name: 'Текст',
     icon: Type,
   },
   {
     id: 'image',
-    name: 'Add Image',
+    name: 'Додати зображення',
     icon: ImagePlus,
   },
   {
     id: 'emoji',
-    name: 'Emoji',
+    name: 'Емоджі',
     icon: Smile,
   },
 ];

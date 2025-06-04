@@ -62,19 +62,17 @@ export function ImagePanel() {
   return (
     <div className="p-4 space-y-4">
       <div>
-        <h3 className="font-medium mb-1">Add Image</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Upload an image to add it as a layer
-        </p>
+        <h3 className="font-medium mb-1">Додати зображення</h3>
+        <p className="text-sm text-muted-foreground mb-4">Завантажте тут</p>
       </div>
 
       <div className="bg-muted/30 border border-dashed rounded-md p-6 flex flex-col items-center justify-center">
         <ImagePlus className="h-10 w-10 text-muted-foreground mb-3" />
         <p className="text-sm text-center text-muted-foreground mb-3">
-          Click to upload an image
+          Тицьніть, щоб завантажити
         </p>
         <Button onClick={handleAddImageClick} variant="outline">
-          Select Image
+          Обрати
         </Button>
         <input
           type="file"
@@ -86,7 +84,7 @@ export function ImagePanel() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Supported formats: JPEG, PNG, GIF, WebP
+        Що можна взяти: JPEG, PNG, GIF, WebP
       </p>
     </div>
   );
